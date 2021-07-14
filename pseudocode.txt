@@ -1,0 +1,17 @@
+MENU
+====
+
+Functionality: A CLI application that produces a list of valid codice fiscali (CF) to help when pentesting Italian apps. It can create a list of all possible CF values, or accept known values such as name, surname etc and just fuzz the remaining unknown or targeted values.
+
+Menu:
+
+1) Enter known values:
+    - prompt surname
+    - prompt name
+    - prompt sex
+    - prompt birthdate (dd/mm/yyyy)
+        Unknown?
+            - prompt min age
+            - prompt max age
+    - prompt comune
+    (calculate check character)
