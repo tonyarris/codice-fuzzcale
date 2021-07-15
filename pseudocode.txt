@@ -6,12 +6,31 @@ Functionality: A CLI application that produces a list of valid codice fiscali (C
 Menu:
 
 1) Enter known values:
-    - prompt surname
-    - prompt name
-    - prompt sex
-    - prompt birthdate (dd/mm/yyyy)
+    - prompt surname (str)
+        - take first 3 consonants
+        - if more than one, concat
+        - if < 3 consonants, go back and fill in with vowels
+        - if < 3 letters, blank = X
+    - prompt name (str)
+        - take first 3 consonants
+        - if more than one, concat
+        - if < 3 consonants, go back and fill in with vowels
+        - if < 3 letters, blank = X
+        - if > 3 consonants, skip the second
+    - prompt sex (M/F)
+        - if M, i = 0
+        - if F, i = 40
+    - prompt birthdate (str: dd/mm/yyyy)
+        - use last 2 digits of year
+        - A-T for month: A Jan, B Feb, C March, D, April, E May, H June, L July, M august, P Sep, R Oct, S Nov, T Dec
+        - i + day (01-31)
         Unknown?
-            - prompt min age
-            - prompt max age
-    - prompt comune
+            - prompt min age (int)
+                - end = current year - input
+            - prompt max age (int)
+                - beginning = current year - input
+            - search range [beginning - end]
+            - fuzz every day within search range
+    - prompt comune (str)
+            - TODO get list
     (calculate check character)
