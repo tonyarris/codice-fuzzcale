@@ -32,5 +32,6 @@ Menu:
             - search range [beginning - end]
             - fuzz every day within search range
     - prompt comune (str)
-            - TODO get list
+            - comune list: https://www1.agenziaentrate.gov.it/servizi/codici/ricerca/VisualizzaTabella.php?ArcName=COM-ICI
+            - foreign states here: http://help.studiok.it/ETRI/index.html?codicefiscaledeglistatiesteri.htm
     (calculate check character)
