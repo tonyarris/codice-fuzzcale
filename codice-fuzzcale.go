@@ -82,6 +82,27 @@ func main() {
 	birthYear = t.Year()
 	birthYear = birthYear % 100
 
+	// birth month dict
+	m := make(map[string]string)
+	m["January"] = "A"
+	m["February"] = "B"
+	m["March"] = "C"
+	m["April"] = "D"
+	m["May"] = "E"
+	m["June"] = "H"
+	m["July"] = "L"
+	m["August"] = "M"
+	m["September"] = "P"
+	m["October"] = "R"
+	m["November"] = "S"
+	m["December"] = "T"
+
+	// get month code
+	mCode := m[t.Month().String()]
+
+	//[]string{"A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"}
+	//var m = t.Month()
+
 	// day of birth
 	// day counter
 	var dayCount int
@@ -95,7 +116,7 @@ func main() {
 	//TODO - calculate check character
 
 	// print concatenated CF
-	fmt.Print(surname, firstname, birthYear)
+	fmt.Print(surname, firstname, birthYear, mCode)
 
 }
 
