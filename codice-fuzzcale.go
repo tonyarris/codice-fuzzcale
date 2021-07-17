@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 	"time"
 
@@ -47,12 +46,12 @@ func main() {
 	var dob string
 	fmt.Scanln(&dob)
 	t, _ := time.Parse(layoutISO, dob)
-	//fmt.Print(t)
 
 	// prompt & store comune
 	fmt.Println("Enter comune of birth: ")
 	var comune string
 	fmt.Scanln(&comune)
+	comune = strings.ToUpper(comune)
 
 	// Construct codice fiscale
 
@@ -85,7 +84,7 @@ func main() {
 	birthYear = t.Year()
 	birthYear = birthYear % 100
 
-	// birth month dict
+	// birth month map
 	m := make(map[string]string)
 	m["January"] = "A"
 	m["February"] = "B"
@@ -116,26 +115,31 @@ func main() {
 
 	// comune code
 	// read comune names
-	file, err := os.Open("./comune_codes/final_codes/comune_names.txt")
+	content, err := ioutil.ReadFile("./comune_codes/final_codes/comune_names.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func() {
-		if err = file.Close(); err != nil {
-			log.Fatal(err)
-		}
-	}()
+	cNames := strings.Split(string(content), "\n")
 
-	scanner := bufio.NewScanner(file)
+	// read comune codes
+	content2, err2 := ioutil.ReadFile("./comune_codes/final_codes/comune_codes.txt")
+	if err2 != nil {
+		log.Fatal(err)
+	}
+	cCodes := strings.Split(string(content2), "\n")
 
-	for scanner.Scan() { // internally, it advances token based on sperator
-		fmt.Println(scanner.Text()) // token in unicode-char
+	// create comune map
+	comuneMap := make(map[string]string)
+	for i := range cNames {
+
+		comuneMap[(cNames[i])] = cCodes[i]
 	}
 
+	comuneCode := comuneMap[comune]
 	//TODO - calculate check character
 
 	// print concatenated CF
-	fmt.Print(surname, firstname, birthYear, mCode, day)
+	fmt.Print(surname, firstname, birthYear, mCode, day, comuneCode)
 
 }
 
