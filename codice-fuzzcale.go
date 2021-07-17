@@ -100,23 +100,21 @@ func main() {
 	// get month code
 	mCode := m[t.Month().String()]
 
-	//[]string{"A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"}
-	//var m = t.Month()
-
 	// day of birth
 	// day counter
 	var dayCount int
-	if sex == "M" {
-		dayCount = 0
-	}
+	dayCount = 0
+
 	if sex == "F" {
 		dayCount = 40
 	}
-	dayCount = dayCount
+	// actual day of birth, plus 40 for F
+	var day int = t.Day() + dayCount
+
 	//TODO - calculate check character
 
 	// print concatenated CF
-	fmt.Print(surname, firstname, birthYear, mCode)
+	fmt.Print(surname, firstname, birthYear, mCode, day)
 
 }
 
