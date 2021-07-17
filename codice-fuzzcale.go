@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -110,6 +113,24 @@ func main() {
 	}
 	// actual day of birth, plus 40 for F
 	var day int = t.Day() + dayCount
+
+	// comune code
+	// read comune names
+	file, err := os.Open("./comune_codes/final_codes/comune_names.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err = file.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() { // internally, it advances token based on sperator
+		fmt.Println(scanner.Text()) // token in unicode-char
+	}
 
 	//TODO - calculate check character
 
