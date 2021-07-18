@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/common-nighthawk/go-figure"
 )
@@ -16,15 +18,23 @@ func main() {
 	// print title
 	title := figure.NewColorFigure("codice FUZZcale", "slant", "red", true)
 	title.Print()
-	time.Sleep(1)
+	time.Sleep(1000)
 	fmt.Println()
 
 	// collect known information from user
 	// TODO - implement unknown functionality
 	// prompt & store surname
-	fmt.Println("Enter surname(s) (Enter for unknown): ")
 	var surname string
+	fmt.Println("Enter surname(s) (Enter for unknown): ")
 	fmt.Scanln(&surname)
+	log.SetPrefix("surname: ")
+	log.SetFlags(0)
+
+	// check validity
+	err := checkSurname(surname)
+	if err != nil {
+		log.Fatal(err)
+	}
 	surname = strings.ToUpper(surname)
 
 	// prompt & store firstname
@@ -285,4 +295,15 @@ func main() {
 
 func delChar(s []rune, index int) []rune {
 	return append(s[0:index], s[index+1:]...)
+}
+
+func checkSurname(s string) error {
+	// sanify input
+	// check only letters
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return errors.New("INVALID SURNAME SUPPLIED - CONTAINS NON-ALPHA CHARACTERS")
+		}
+	}
+	return nil
 }
