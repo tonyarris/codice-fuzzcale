@@ -31,7 +31,7 @@ func main() {
 	log.SetFlags(0)
 
 	// check validity
-	err := checkSurname(surname)
+	err := checkName(surname)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -297,12 +297,12 @@ func delChar(s []rune, index int) []rune {
 	return append(s[0:index], s[index+1:]...)
 }
 
-func checkSurname(s string) error {
+func checkName(s string) error {
 	// sanify input
-	// check only letters
+	// check contains only letters
 	for _, r := range s {
 		if !unicode.IsLetter(r) {
-			return errors.New("INVALID SURNAME SUPPLIED - CONTAINS NON-ALPHA CHARACTERS")
+			return errors.New("INVALID SURNAME")
 		}
 	}
 	return nil
