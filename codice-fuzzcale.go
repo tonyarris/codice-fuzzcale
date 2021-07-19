@@ -26,9 +26,11 @@ func main() {
 	// prompt & store surname
 	var surname string
 	fmt.Println("Enter surname(s) (Enter for unknown): ")
+	// TODO - accept multiple names w/ space - use bufio ReadString https://tutorialedge.net/golang/reading-console-input-golang/
 	fmt.Scanln(&surname)
 	log.SetPrefix("surname: ")
 	log.SetFlags(0)
+	fmt.Print(surname)
 
 	// check validity
 	err := checkName(surname)
@@ -41,6 +43,15 @@ func main() {
 	fmt.Println("Enter firstname(s) (Enter for unknown): ")
 	var firstname string
 	fmt.Scanln(&firstname)
+	log.SetPrefix("name: ")
+	log.SetFlags(0)
+	fmt.Print(firstname)
+
+	//check validity
+	err = checkName(firstname)
+	if err != nil {
+		log.Fatal(err)
+	}
 	firstname = strings.ToUpper(firstname)
 
 	// prompt & store sex
