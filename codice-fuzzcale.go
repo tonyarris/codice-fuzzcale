@@ -41,6 +41,7 @@ func main() {
 	log.SetFlags(0)
 
 	// check validity
+	// TODO - handle error on Windows - invalid surname
 	err := checkName(surname)
 	if err != nil {
 		log.Fatal(err)
@@ -49,18 +50,24 @@ func main() {
 
 	// prompt & store firstname
 	fmt.Println("Enter firstname(s) (Enter for unknown): ")
-	var firstname string
-	fmt.Scanln(&firstname)
-	log.SetPrefix("name: ")
-	log.SetFlags(0)
-	fmt.Print(firstname)
+	firstname, _ := reader.ReadString('\n')
 
-	//check validity
+	// convert CRLF to LF for Windows compatibility
+	firstname = strings.Replace(firstname, "\n", "", -1)
+
+	// strip spaces
+	firstname = stripSpace(firstname)
+
+	// set logs
+	log.SetPrefix("firstname: ")
+	log.SetFlags(0)
+
+	// check validity
 	err = checkName(firstname)
 	if err != nil {
 		log.Fatal(err)
 	}
-	firstname = strings.ToUpper(firstname)
+	firstname = strings.ToUpper(surname)
 
 	// prompt & store sex
 	fmt.Println("Enter sex (M/F/Enter for unknown): ")
