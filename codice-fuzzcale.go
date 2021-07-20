@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -24,13 +26,19 @@ func main() {
 	// collect known information from user
 	// TODO - implement unknown functionality
 	// prompt & store surname
-	var surname string
 	fmt.Println("Enter surname(s) (Enter for unknown): ")
-	// TODO - accept multiple names w/ space - use bufio ReadString https://tutorialedge.net/golang/reading-console-input-golang/
-	fmt.Scanln(&surname)
+	reader := bufio.NewReader(os.Stdin)
+	surname, _ := reader.ReadString('\n')
+
+	// convert CRLF to LF for Windows compatibility
+	surname = strings.Replace(surname, "\n", "", -1)
+
+	// strip spaces
+	surname = stripSpace(surname)
+
+	// set logs
 	log.SetPrefix("surname: ")
 	log.SetFlags(0)
-	fmt.Print(surname)
 
 	// check validity
 	err := checkName(surname)
@@ -310,11 +318,16 @@ func delChar(s []rune, index int) []rune {
 
 func checkName(s string) error {
 	// sanify input
-	// check contains only letters
+	// check contains only letters & spaces
 	for _, r := range s {
 		if !unicode.IsLetter(r) {
 			return errors.New("INVALID SURNAME")
 		}
 	}
 	return nil
+}
+
+func stripSpace(s string) string {
+	s = strings.ReplaceAll(s, " ", "")
+	return s
 }

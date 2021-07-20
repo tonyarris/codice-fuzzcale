@@ -6,10 +6,18 @@ import (
 
 // test checkName
 func TestValidName(t *testing.T) {
-	// test valid name
-	err := checkName("marco")
+	// valid name
+	err := checkName("marcus")
 	if err != nil {
 		t.Fatalf(`checkName("marco") results in error`)
+	}
+
+	// name with space
+	name := "marcus aurelius "
+	name = stripSpace(name)
+	err = checkName(name)
+	if err != nil {
+		t.Fatalf(`a name containing spaces results in error`)
 	}
 }
 
