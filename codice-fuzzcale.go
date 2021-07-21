@@ -31,7 +31,7 @@ func main() {
 	surname, _ := reader.ReadString('\n')
 
 	// convert CRLF to LF for Windows compatibility
-	surname = strings.Replace(surname, "\n", "", -1)
+	surname = strings.Replace(surname, "\r\n", "", -1)
 
 	// strip spaces
 	surname = stripSpace(surname)
@@ -53,7 +53,7 @@ func main() {
 	firstname, _ := reader.ReadString('\n')
 
 	// convert CRLF to LF for Windows compatibility
-	firstname = strings.Replace(firstname, "\n", "", -1)
+	firstname = strings.Replace(firstname, "\r\n", "", -1)
 
 	// strip spaces
 	firstname = stripSpace(firstname)
@@ -328,7 +328,7 @@ func checkName(s string) error {
 	// check contains only letters & spaces
 	for _, r := range s {
 		if !unicode.IsLetter(r) {
-			return errors.New("INVALID SURNAME")
+			return errors.New("INVALID INPUT")
 		}
 	}
 	return nil
