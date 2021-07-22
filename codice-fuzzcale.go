@@ -94,19 +94,16 @@ func main() {
 
 	// surname triplet
 	// remove vowels from surname
-	for _, c := range []string{"A", "E", "I", "O", "U"} {
+	surname = removeVowels(surname)
 
-		surname = strings.ReplaceAll(surname, c, "")
+	if len(surname) >= 3 {
+		surname = surname[0:3]
 	}
-	surname = surname[0:3]
 	// TODO - account for <3 consonants & <3 letters
 
 	// name triplet
 	// remove vowels from name
-	for _, c := range []string{"A", "E", "I", "O", "U"} {
-
-		firstname = strings.ReplaceAll(firstname, c, "")
-	}
+	firstname = removeVowels(firstname)
 
 	// if > 3 consonants in firstname, skip the second
 	var nameTrip []rune = []rune(firstname)
@@ -114,7 +111,10 @@ func main() {
 		nameTrip = delChar(nameTrip, 1)
 	}
 	firstname = string(nameTrip)
-	firstname = firstname[0:3]
+
+	if len(firstname) >= 3 {
+		firstname = firstname[0:3]
+	}
 
 	// birth year
 	var birthYear int
@@ -336,5 +336,13 @@ func checkName(s string) error {
 
 func stripSpace(s string) string {
 	s = strings.ReplaceAll(s, " ", "")
+	return s
+}
+
+func removeVowels(s string) string {
+	for _, c := range []string{"A", "E", "I", "O", "U"} {
+
+		s = strings.ReplaceAll(s, c, "")
+	}
 	return s
 }

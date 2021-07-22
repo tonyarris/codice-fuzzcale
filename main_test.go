@@ -17,7 +17,7 @@ func TestValidName(t *testing.T) {
 	name = stripSpace(name)
 	err = checkName(name)
 	if err != nil {
-		t.Fatalf(`a name containing spaces results in error`)
+		t.Fatalf(`A name containing spaces results in error`)
 	}
 }
 
@@ -30,5 +30,13 @@ func TestInvalidName(t *testing.T) {
 	err = checkName("O'Hanlan")
 	if err == nil {
 		t.Fatalf(`An apostrophe has been allowed`)
+	}
+}
+
+func TestRemoveVowels(t *testing.T) {
+	s := "AEIOUX"
+	s = removeVowels(s)
+	if s != "X" {
+		t.Fatalf(`Remove vowels function failure`)
 	}
 }
