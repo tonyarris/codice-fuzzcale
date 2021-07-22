@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -30,8 +31,8 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	surname, _ := reader.ReadString('\n')
 
-	// convert CRLF to LF for Windows compatibility
-	surname = strings.Replace(surname, "\n", "", -1)
+	// replace newline
+	surname = replaceNewLine(surname)
 
 	// strip spaces
 	surname = stripSpace(surname)
@@ -41,7 +42,6 @@ func main() {
 	log.SetFlags(0)
 
 	// check validity
-	// TODO - handle error on Windows - invalid surname
 	err := checkName(surname)
 	if err != nil {
 		log.Fatal(err)
@@ -52,9 +52,8 @@ func main() {
 	fmt.Println("Enter firstname(s) (Enter for unknown): ")
 	firstname, _ := reader.ReadString('\n')
 
-	// convert CRLF to LF for Windows compatibility
-	firstname = strings.Replace(firstname, "\n", "", -1)
-
+	// replace newline
+	firstname = replaceNewLine(firstname)
 	// strip spaces
 	firstname = stripSpace(firstname)
 
@@ -328,7 +327,7 @@ func checkName(s string) error {
 	// check contains only letters & spaces
 	for _, r := range s {
 		if !unicode.IsLetter(r) {
-			return errors.New("INVALID SURNAME")
+			return errors.New("INVALID INPUT")
 		}
 	}
 	return nil
@@ -343,6 +342,16 @@ func removeVowels(s string) string {
 	for _, c := range []string{"A", "E", "I", "O", "U"} {
 
 		s = strings.ReplaceAll(s, c, "")
+	}
+	return s
+}
+
+func replaceNewLine(s string) string {
+	if runtime.GOOS == "windows" {
+		// for Windows compatibility
+		s = strings.Replace(s, "\r\n", "", -1)
+	} else {
+		s = strings.Replace(s, "\n", "", -1)
 	}
 	return s
 }
