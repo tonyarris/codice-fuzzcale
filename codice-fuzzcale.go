@@ -266,7 +266,7 @@ func main() {
 	evenMap["W"] = 22
 	evenMap["X"] = 23
 	evenMap["Y"] = 24
-	evenMap["Z"] = 23
+	evenMap["Z"] = 25
 
 	// calculate intermediate values
 	runeOdd := []rune(odd)
