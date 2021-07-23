@@ -155,14 +155,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cNames := strings.Split(string(content), "\n")
+	cNames := splitString(content)
 
 	// read comune codes
 	content2, err2 := ioutil.ReadFile("./comune_codes/final_codes/comune_codes.txt")
 	if err2 != nil {
 		log.Fatal(err)
 	}
-	cCodes := strings.Split(string(content2), "\n")
+	cCodes := splitString(content2)
 
 	// TODO - add foreign comune codes
 
@@ -354,4 +354,15 @@ func replaceNewLine(s string) string {
 		s = strings.Replace(s, "\n", "", -1)
 	}
 	return s
+}
+
+func splitString(b []byte) []string {
+	var splitList []string
+	if runtime.GOOS == "windows" {
+		// for Windows compatibility
+		splitList = strings.Split(string(b), "\r\n")
+	} else {
+		splitList = strings.Split(string(b), "\n")
+	}
+	return splitList
 }
