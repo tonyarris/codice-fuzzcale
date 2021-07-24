@@ -71,8 +71,20 @@ func main() {
 	// prompt & store sex
 	fmt.Println("Enter sex (M/F/Enter for unknown): ")
 	var sex string
-	fmt.Scanln(&sex)
+	sex, _ = reader.ReadString('\n')
 	sex = strings.ToUpper(sex)
+
+	// set logs
+	log.SetPrefix("sex: ")
+	log.SetFlags(0)
+
+	// validate sex
+	var sexCheck []rune
+	sexCheck = []rune(sex)
+	err = checkSex(sexCheck)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// prompt & store DOB
 	const (
@@ -365,4 +377,16 @@ func splitString(b []byte) []string {
 		splitList = strings.Split(string(b), "\n")
 	}
 	return splitList
+}
+
+func checkSex(s []rune) error {
+	if s[0] != 'M' {
+		if s[0] != 'F' {
+			if len(s) > 1 {
+				return errors.New("INVALID SEX")
+			}
+		}
+	}
+
+	return nil
 }
