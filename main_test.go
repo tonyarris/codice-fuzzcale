@@ -37,6 +37,25 @@ func TestRemoveVowels(t *testing.T) {
 	s := "AEIOUX"
 	s = removeVowels(s)
 	if s != "X" {
-		t.Fatalf(`Remove vowels function failure`)
+		t.Fatalf(`removeVowels() failure`)
 	}
+}
+
+func TestCheckSex(t *testing.T) {
+	var s []rune
+	p := "M"
+	s = []rune(p)
+	err := checkSex(s)
+	if err != nil {
+		t.Fatal("checkSex() failure")
+	}
+
+	p = "F"
+	s = []rune(p)
+	err = checkSex(s)
+	if err != nil {
+		t.Fatal("checkSex() failure")
+	}
+
+	// TODO add empty string test
 }
