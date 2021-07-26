@@ -387,6 +387,5 @@ func checkSex(s []rune) error {
 			}
 		}
 	}
-
 	return nil
 }
