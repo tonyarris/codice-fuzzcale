@@ -9,12 +9,18 @@ Menu:
     - prompt surname (str)
         - take first 3 consonants
         - if more than one, concat
-        - if < 3 consonants, go back and fill in with vowels
+        - if < 3 consonants:
+            save the 0-2 consonants
+            get vowels in order
+            fill from vowel list until len = 3
         - if < 3 letters, blank = X
     - prompt name (str)
         - take first 3 consonants
         - if more than one, concat
-        - if < 3 consonants, go back and fill in with vowels
+        - if < 3 consonants: 
+            save the 0-2 consonants
+            get vowels in order
+            fill from vowel list until len = 3
         - if < 3 letters, blank = X
         - if > 3 consonants, skip the second
     - prompt sex (M/F)

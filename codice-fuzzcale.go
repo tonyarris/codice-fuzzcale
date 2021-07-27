@@ -73,15 +73,14 @@ func main() {
 	var sex string
 	sex, _ = reader.ReadString('\n')
 	sex = strings.ToUpper(sex)
+	sex = trimRight(sex)
 
 	// set logs
 	log.SetPrefix("sex: ")
 	log.SetFlags(0)
 
 	// validate sex
-	var sexCheck []rune
-	sexCheck = []rune(sex)
-	err = checkSex(sexCheck)
+	err = checkSex(sex)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -379,13 +378,21 @@ func splitString(b []byte) []string {
 	return splitList
 }
 
-func checkSex(s []rune) error {
-	if s[0] != 'M' {
-		if s[0] != 'F' {
-			if len(s) > 1 {
-				return errors.New("INVALID SEX")
-			}
-		}
+func trimRight(b string) string {
+	var stripped string
+	if runtime.GOOS == "windows" {
+		// for Windows compatibility
+		stripped = strings.TrimRight(b, "\r\n")
+	} else {
+		stripped = strings.TrimRight(b, "\n")
 	}
-	return nil
+	return stripped
+}
+
+func checkSex(s string) error {
+	if s == "M" || s == "F" || s == "" {
+		return nil
+	} else {
+		return errors.New("INVALID SEX")
+	}
 }

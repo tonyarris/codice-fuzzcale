@@ -42,24 +42,31 @@ func TestRemoveVowels(t *testing.T) {
 }
 
 func TestCheckSex(t *testing.T) {
-	// TO FIX - test always passes
-	var s []rune
-	s = []rune("M")
-	err := checkSex(s)
+	// valid input
+	err := checkSex("M")
 	if err != nil {
 		t.Fatal("checkSex() failure")
 	}
 
-	s = []rune("F")
-	err = checkSex(s)
+	err = checkSex("F")
 	if err != nil {
 		t.Fatal("checkSex() failure")
 	}
 
-	s = []rune(" ")
-	err = checkSex(s)
+	err = checkSex("")
 	if err != nil {
 		t.Fatal("checkSex() failure")
+	}
+
+	// invalid input
+	err = checkSex("X")
+	if err == nil {
+		t.Fatal("checkSex() failure - allows invalid input")
+	}
+
+	err = checkSex("M1")
+	if err == nil {
+		t.Fatal("checkSex() failure - allows invalid input")
 	}
 
 }
