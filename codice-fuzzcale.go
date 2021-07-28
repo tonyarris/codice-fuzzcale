@@ -66,7 +66,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	firstname = strings.ToUpper(surname)
+	firstname = strings.ToUpper(firstname)
 
 	// prompt & store sex
 	fmt.Println("Enter sex (M/F/Enter for unknown): ")
@@ -94,6 +94,8 @@ func main() {
 	fmt.Scanln(&dob)
 	t, _ := time.Parse(layoutISO, dob)
 
+	// TODO verify birth date format
+
 	// prompt & store comune
 	fmt.Println("Enter comune of birth: ")
 	var comune string
@@ -116,8 +118,6 @@ func main() {
 	// remove vowels from name
 	firstname = removeVowels(firstname)
 
-	firstname = constructTriplet(firstname, f_vowels)
-
 	// if > 3 consonants in firstname, skip the second
 	var nameTrip []rune = []rune(firstname)
 	if len(firstname) > 3 {
@@ -128,6 +128,8 @@ func main() {
 	if len(firstname) >= 3 {
 		firstname = firstname[0:3]
 	}
+
+	firstname = constructTriplet(firstname, f_vowels)
 
 	// birth year
 	var birthYear int
