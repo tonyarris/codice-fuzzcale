@@ -103,17 +103,20 @@ func main() {
 	// Construct codice fiscale
 
 	// surname triplet
+	// extract vowels from surname
+	s_vowels := extractVowels(surname)
 	// remove vowels from surname
 	surname = removeVowels(surname)
 
-	if len(surname) >= 3 {
-		surname = surname[0:3]
-	}
-	// TODO - account for <3 consonants & <3 letters
+	surname = constructTriplet(surname, s_vowels)
 
 	// name triplet
+	// extract vowels from firstname
+	f_vowels := extractVowels(firstname)
 	// remove vowels from name
 	firstname = removeVowels(firstname)
+
+	firstname = constructTriplet(firstname, f_vowels)
 
 	// if > 3 consonants in firstname, skip the second
 	var nameTrip []rune = []rune(firstname)
@@ -357,6 +360,27 @@ func removeVowels(s string) string {
 	return s
 }
 
+func extractVowels(s string) string {
+	for _, c := range []string{"B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"} {
+
+		s = strings.ReplaceAll(s, c, "")
+	}
+	return s
+}
+
+func constructTriplet(s, v string) string {
+	if len(s) >= 3 {
+		s = s[0:3]
+	} else {
+		s = s + v
+		// if < 3 letters total, fill with X
+		if len(s) > 0 && len(s) < 3 {
+			s = s + "XX"
+			s = s[0:3]
+		}
+	}
+	return s
+}
 func replaceNewLine(s string) string {
 	if runtime.GOOS == "windows" {
 		// for Windows compatibility
