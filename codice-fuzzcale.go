@@ -74,7 +74,7 @@ func main() {
 	var sex string
 	sex, _ = reader.ReadString('\n')
 	sex = strings.ToUpper(sex)
-	sex = trimRight(sex)
+	sex = replaceNewLine(sex)
 
 	// set logs
 	log.SetPrefix("sex: ")
@@ -93,7 +93,7 @@ func main() {
 	fmt.Println("Enter date of birth (yyyy-mm-dd): ")
 	var dob string
 	dob, _ = reader.ReadString('\n')
-	dob = trimRight(dob)
+	dob = replaceNewLine(dob)
 	t, _ := time.Parse(layoutISO, dob)
 
 	// set logs
@@ -414,17 +414,6 @@ func splitString(b []byte) []string {
 	return splitList
 }
 
-func trimRight(b string) string {
-	var stripped string
-	if runtime.GOOS == "windows" {
-		// for Windows compatibility
-		stripped = strings.TrimRight(b, "\r\n")
-	} else {
-		stripped = strings.TrimRight(b, "\n")
-	}
-	return stripped
-}
-
 func checkSex(s string) error {
 	if s == "M" || s == "F" || s == "" {
 		return nil
@@ -435,7 +424,9 @@ func checkSex(s string) error {
 
 // TODO - fix check
 func checkDate(s string) error {
-	matched, _ := regexp.MatchString"/^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/", s)
+	fmt.Print(s)
+	reg, _ := regexp.Compile(`/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/`)
+	matched := reg.MatchString(s)
 	if !matched {
 		return errors.New("INVALID DOB")
 	} else {
