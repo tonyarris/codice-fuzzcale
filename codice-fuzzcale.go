@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -91,10 +92,19 @@ func main() {
 	)
 	fmt.Println("Enter date of birth (yyyy-mm-dd): ")
 	var dob string
-	fmt.Scanln(&dob)
+	dob, _ = reader.ReadString('\n')
+	dob = trimRight(dob)
 	t, _ := time.Parse(layoutISO, dob)
 
+	// set logs
+	log.SetPrefix("date of birth: ")
+	log.SetFlags(0)
+
 	// TODO verify birth date format
+	err = checkDate(dob)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// prompt & store comune
 	fmt.Println("Enter comune of birth: ")
@@ -420,5 +430,15 @@ func checkSex(s string) error {
 		return nil
 	} else {
 		return errors.New("INVALID SEX")
+	}
+}
+
+// TODO - fix check
+func checkDate(s string) error {
+	matched, _ := regexp.MatchString"/^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/", s)
+	if !matched {
+		return errors.New("INVALID DOB")
+	} else {
+		return nil
 	}
 }
