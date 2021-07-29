@@ -101,15 +101,16 @@ func main() {
 	log.SetFlags(0)
 
 	// TODO verify birth date format
-	err = checkDate(dob)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = checkDate(dob)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// prompt & store comune
 	fmt.Println("Enter comune of birth: ")
 	var comune string
-	fmt.Scanln(&comune)
+	comune, _ = reader.ReadString('\n')
+	comune = replaceNewLine(comune)
 	comune = strings.ToUpper(comune)
 
 	// Construct codice fiscale
@@ -339,7 +340,7 @@ func main() {
 	check := rem[combinedValue]
 
 	// print concatenated CF
-	cf = cf + check
+	cf = replaceNewLine(cf + check)
 	fmt.Print(cf)
 
 }
