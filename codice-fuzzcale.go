@@ -17,6 +17,132 @@ import (
 	"github.com/common-nighthawk/go-figure"
 )
 
+// birth month map
+var m = map[string]string{
+	"January":   "A",
+	"February":  "B",
+	"March":     "C",
+	"April":     "D",
+	"May":       "E",
+	"June":      "H",
+	"July":      "L",
+	"August":    "M",
+	"September": "P",
+	"October":   "R",
+	"November":  "S",
+	"December":  "T",
+}
+
+// odd check map
+var oddMap = map[string]int{
+	"0": 1,
+	"1": 0,
+	"2": 5,
+	"3": 7,
+	"4": 9,
+	"5": 13,
+	"6": 15,
+	"7": 17,
+	"8": 19,
+	"9": 21,
+	"A": 1,
+	"B": 0,
+	"C": 5,
+	"D": 7,
+	"E": 9,
+	"F": 13,
+	"G": 15,
+	"H": 17,
+	"I": 19,
+	"J": 21,
+	"K": 2,
+	"L": 4,
+	"M": 18,
+	"N": 20,
+	"O": 11,
+	"P": 3,
+	"Q": 6,
+	"R": 8,
+	"S": 12,
+	"T": 14,
+	"U": 16,
+	"V": 10,
+	"W": 22,
+	"X": 25,
+	"Y": 24,
+	"Z": 23,
+}
+
+// even check map
+var evenMap = map[string]int{
+	"0": 0,
+	"1": 1,
+	"2": 2,
+	"3": 3,
+	"4": 4,
+	"5": 5,
+	"6": 6,
+	"7": 7,
+	"8": 8,
+	"9": 9,
+	"A": 0,
+	"B": 1,
+	"C": 2,
+	"D": 3,
+	"E": 4,
+	"F": 5,
+	"G": 6,
+	"H": 7,
+	"I": 8,
+	"J": 9,
+	"K": 10,
+	"L": 11,
+	"M": 12,
+	"N": 13,
+	"O": 14,
+	"P": 15,
+	"Q": 16,
+	"R": 17,
+	"S": 18,
+	"T": 19,
+	"U": 20,
+	"V": 21,
+	"W": 22,
+	"X": 23,
+	"Y": 24,
+	"Z": 25,
+}
+
+// remainder map
+var rem = map[int]string{
+	0:  "A",
+	1:  "B",
+	2:  "C",
+	3:  "D",
+	4:  "E",
+	5:  "F",
+	6:  "G",
+	7:  "H",
+	8:  "I",
+	9:  "J",
+	10: "K",
+	11: "L",
+	12: "M",
+	13: "N",
+	14: "O",
+	15: "P",
+	16: "Q",
+	17: "R",
+	18: "S",
+	19: "T",
+	20: "U",
+	21: "V",
+	22: "W",
+	23: "X",
+	24: "Y",
+	25: "Z",
+}
+
 func main() {
 
 	// print title
@@ -148,21 +274,6 @@ func main() {
 	birthYear = t.Year()
 	birthYear = birthYear % 100
 
-	// birth month map
-	m := make(map[string]string)
-	m["January"] = "A"
-	m["February"] = "B"
-	m["March"] = "C"
-	m["April"] = "D"
-	m["May"] = "E"
-	m["June"] = "H"
-	m["July"] = "L"
-	m["August"] = "M"
-	m["September"] = "P"
-	m["October"] = "R"
-	m["November"] = "S"
-	m["December"] = "T"
-
 	// get month code
 	mCode := m[t.Month().String()]
 
@@ -216,84 +327,6 @@ func main() {
 		even = even + string(runeCF[i])
 	}
 
-	// odd check map
-	oddMap := make(map[string]int)
-	oddMap["0"] = 1
-	oddMap["1"] = 0
-	oddMap["2"] = 5
-	oddMap["3"] = 7
-	oddMap["4"] = 9
-	oddMap["5"] = 13
-	oddMap["6"] = 15
-	oddMap["7"] = 17
-	oddMap["8"] = 19
-	oddMap["9"] = 21
-	oddMap["A"] = 1
-	oddMap["B"] = 0
-	oddMap["C"] = 5
-	oddMap["D"] = 7
-	oddMap["E"] = 9
-	oddMap["F"] = 13
-	oddMap["G"] = 15
-	oddMap["H"] = 17
-	oddMap["I"] = 19
-	oddMap["J"] = 21
-	oddMap["K"] = 2
-	oddMap["L"] = 4
-	oddMap["M"] = 18
-	oddMap["N"] = 20
-	oddMap["O"] = 11
-	oddMap["P"] = 3
-	oddMap["Q"] = 6
-	oddMap["R"] = 8
-	oddMap["S"] = 12
-	oddMap["T"] = 14
-	oddMap["U"] = 16
-	oddMap["V"] = 10
-	oddMap["W"] = 22
-	oddMap["X"] = 25
-	oddMap["Y"] = 24
-	oddMap["Z"] = 23
-
-	// even check map
-	evenMap := make(map[string]int)
-	evenMap["0"] = 0
-	evenMap["1"] = 1
-	evenMap["2"] = 2
-	evenMap["3"] = 3
-	evenMap["4"] = 4
-	evenMap["5"] = 5
-	evenMap["6"] = 6
-	evenMap["7"] = 7
-	evenMap["8"] = 8
-	evenMap["9"] = 9
-	evenMap["A"] = 0
-	evenMap["B"] = 1
-	evenMap["C"] = 2
-	evenMap["D"] = 3
-	evenMap["E"] = 4
-	evenMap["F"] = 5
-	evenMap["G"] = 6
-	evenMap["H"] = 7
-	evenMap["I"] = 8
-	evenMap["J"] = 9
-	evenMap["K"] = 10
-	evenMap["L"] = 11
-	evenMap["M"] = 12
-	evenMap["N"] = 13
-	evenMap["O"] = 14
-	evenMap["P"] = 15
-	evenMap["Q"] = 16
-	evenMap["R"] = 17
-	evenMap["S"] = 18
-	evenMap["T"] = 19
-	evenMap["U"] = 20
-	evenMap["V"] = 21
-	evenMap["W"] = 22
-	evenMap["X"] = 23
-	evenMap["Y"] = 24
-	evenMap["Z"] = 25
-
 	// calculate intermediate values
 	runeOdd := []rune(odd)
 	runeEven := []rune(even)
@@ -306,35 +339,6 @@ func main() {
 		evenValue = evenValue + evenMap[string(runeEven[i])]
 	}
 	combinedValue := (oddValue + evenValue) % 26
-
-	// remainder map
-	rem := make(map[int]string)
-	rem[0] = "A"
-	rem[1] = "B"
-	rem[2] = "C"
-	rem[3] = "D"
-	rem[4] = "E"
-	rem[5] = "F"
-	rem[6] = "G"
-	rem[7] = "H"
-	rem[8] = "I"
-	rem[9] = "J"
-	rem[10] = "K"
-	rem[11] = "L"
-	rem[12] = "M"
-	rem[13] = "N"
-	rem[14] = "O"
-	rem[15] = "P"
-	rem[16] = "Q"
-	rem[17] = "R"
-	rem[18] = "S"
-	rem[19] = "T"
-	rem[20] = "U"
-	rem[21] = "V"
-	rem[22] = "W"
-	rem[23] = "X"
-	rem[24] = "Y"
-	rem[25] = "Z"
 
 	check := rem[combinedValue]
 
