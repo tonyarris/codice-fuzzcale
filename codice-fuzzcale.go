@@ -175,7 +175,6 @@ func main() {
 		dayCount = 40
 	}
 	// actual day of birth, plus 40 for F
-	// TODO - zero pad single digit day numbers
 	var day int = t.Day() + dayCount
 
 	// comune code
@@ -193,8 +192,6 @@ func main() {
 	}
 	cCodes := splitString(content2)
 
-	// TODO - add foreign comune codes
-
 	// create comune map
 	comuneMap := make(map[string]string)
 	for i := range cNames {
@@ -205,7 +202,7 @@ func main() {
 	comuneCode := comuneMap[comune]
 
 	// calculate check character
-	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d" /*strconv.Itoa(*/, day) /*)*/ + comuneCode
+	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
 
 	// split into evens & evens
 	runeCF := []rune(cf)
