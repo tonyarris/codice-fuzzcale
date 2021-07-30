@@ -205,7 +205,7 @@ func main() {
 	comuneCode := comuneMap[comune]
 
 	// calculate check character
-	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + strconv.Itoa(day) + comuneCode
+	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d" /*strconv.Itoa(*/, day) /*)*/ + comuneCode
 
 	// split into evens & evens
 	runeCF := []rune(cf)
