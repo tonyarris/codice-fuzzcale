@@ -95,6 +95,7 @@ func main() {
 	dob, _ = reader.ReadString('\n')
 	dob = replaceNewLine(dob)
 	t, _ := time.Parse(layoutISO, dob)
+	fmt.Print(t)
 
 	// set logs
 	log.SetPrefix("date of birth: ")
@@ -174,6 +175,7 @@ func main() {
 		dayCount = 40
 	}
 	// actual day of birth, plus 40 for F
+	// TODO - zero pad single digit day numbers
 	var day int = t.Day() + dayCount
 
 	// comune code
