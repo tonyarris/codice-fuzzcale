@@ -143,6 +143,8 @@ var rem = map[int]string{
 	25: "Z",
 }
 
+var comuneMap = createComuneMap()
+
 func main() {
 
 	// print title
@@ -221,7 +223,6 @@ func main() {
 	dob, _ = reader.ReadString('\n')
 	dob = replaceNewLine(dob)
 	t, _ := time.Parse(layoutISO, dob)
-	fmt.Print(t)
 
 	// set logs
 	log.SetPrefix("date of birth: ")
@@ -288,28 +289,7 @@ func main() {
 	// actual day of birth, plus 40 for F
 	var day int = t.Day() + dayCount
 
-	// comune code
-	// read comune names
-	content, err := ioutil.ReadFile("./comune_codes/final_codes/comune_names.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	cNames := splitString(content)
-
-	// read comune codes
-	content2, err2 := ioutil.ReadFile("./comune_codes/final_codes/comune_codes.txt")
-	if err2 != nil {
-		log.Fatal(err)
-	}
-	cCodes := splitString(content2)
-
-	// create comune map
-	comuneMap := make(map[string]string)
-	for i := range cNames {
-
-		comuneMap[(cNames[i])] = cCodes[i]
-	}
-
+	// assign comune code
 	comuneCode := comuneMap[comune]
 
 	// calculate check character
@@ -436,4 +416,30 @@ func checkDate(s string) error {
 	} else {
 		return nil
 	}
+}
+
+func createComuneMap() map[string]string {
+	// comune code
+	// read comune names
+	content, err := ioutil.ReadFile("./comune_codes/final_codes/comune_names.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cNames := splitString(content)
+
+	// read comune codes
+	content2, err2 := ioutil.ReadFile("./comune_codes/final_codes/comune_codes.txt")
+	if err2 != nil {
+		log.Fatal(err)
+	}
+	cCodes := splitString(content2)
+
+	// create comune map
+	comuneMap := make(map[string]string)
+	for i := range cNames {
+
+		comuneMap[(cNames[i])] = cCodes[i]
+	}
+
+	return comuneMap
 }
