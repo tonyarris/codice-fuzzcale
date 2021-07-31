@@ -150,13 +150,13 @@ func main() {
 	// print title
 	title := figure.NewColorFigure("codice FUZZcale", "slant", "red", true)
 	title.Print()
-	time.Sleep(1000)
 	fmt.Println()
 
 	// collect known information from user
 	// TODO - implement unknown functionality
+	fmt.Println("Just hit ENTER for unknown values")
 	// prompt & store surname
-	fmt.Println("Enter surname(s) (Enter for unknown): ")
+	fmt.Println("Enter surname(s): ")
 	reader := bufio.NewReader(os.Stdin)
 	surname, _ := reader.ReadString('\n')
 
@@ -178,7 +178,7 @@ func main() {
 	surname = strings.ToUpper(surname)
 
 	// prompt & store firstname
-	fmt.Println("Enter firstname(s) (Enter for unknown): ")
+	fmt.Println("Enter firstname(s):")
 	firstname, _ := reader.ReadString('\n')
 
 	// replace newline
@@ -187,7 +187,7 @@ func main() {
 	firstname = stripSpace(firstname)
 
 	// set logs
-	log.SetPrefix("firstname: ")
+	log.SetPrefix("firstname:")
 	log.SetFlags(0)
 
 	// check validity
@@ -198,14 +198,14 @@ func main() {
 	firstname = strings.ToUpper(firstname)
 
 	// prompt & store sex
-	fmt.Println("Enter sex (M/F/Enter for unknown): ")
+	fmt.Println("Enter sex (M/F):")
 	var sex string
 	sex, _ = reader.ReadString('\n')
 	sex = strings.ToUpper(sex)
 	sex = replaceNewLine(sex)
 
 	// set logs
-	log.SetPrefix("sex: ")
+	log.SetPrefix("sex:")
 	log.SetFlags(0)
 
 	// validate sex
@@ -218,14 +218,14 @@ func main() {
 	const (
 		layoutISO = "2006-01-02"
 	)
-	fmt.Println("Enter date of birth (yyyy-mm-dd): ")
+	fmt.Println("Enter date of birth (yyyy-mm-dd):")
 	var dob string
 	dob, _ = reader.ReadString('\n')
 	dob = replaceNewLine(dob)
 	t, _ := time.Parse(layoutISO, dob)
 
 	// set logs
-	log.SetPrefix("date of birth: ")
+	log.SetPrefix("date of birth:")
 	log.SetFlags(0)
 
 	// TODO verify birth date format
@@ -235,7 +235,7 @@ func main() {
 	// }
 
 	// prompt & store comune
-	fmt.Println("Enter comune of birth: ")
+	fmt.Println("Enter comune of birth:")
 	var comune string
 	comune, _ = reader.ReadString('\n')
 	comune = replaceNewLine(comune)
