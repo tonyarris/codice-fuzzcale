@@ -325,7 +325,7 @@ func main() {
 	// calculate check character
 	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
 
-	// split into evens & evens
+	// split into odds & evens
 	runeCF := []rune(cf)
 	var odd string
 	var even string
