@@ -68,5 +68,8 @@ func TestCheckSex(t *testing.T) {
 	if err == nil {
 		t.Fatal("checkSex() failure - allows invalid input")
 	}
+}
 
+func TestFuzzName(t *testing.T) {
+	fuzzAlphabet()
 }

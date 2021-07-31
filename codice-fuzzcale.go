@@ -166,6 +166,12 @@ func main() {
 	// strip spaces
 	surname = stripSpace(surname)
 
+	// detect unknown
+	if len(surname) == 0 {
+		fuzzSurname := true
+		fmt.Print(fuzzSurname)
+	}
+
 	// set logs
 	log.SetPrefix("surname: ")
 	log.SetFlags(0)
@@ -186,6 +192,12 @@ func main() {
 	// strip spaces
 	firstname = stripSpace(firstname)
 
+	// detect unknown
+	if len(firstname) == 0 {
+		fuzzFirstname := true
+		fmt.Print(fuzzFirstname)
+	}
+
 	// set logs
 	log.SetPrefix("firstname:")
 	log.SetFlags(0)
@@ -203,6 +215,12 @@ func main() {
 	sex, _ = reader.ReadString('\n')
 	sex = strings.ToUpper(sex)
 	sex = replaceNewLine(sex)
+
+	// detect unknown
+	if len(sex) == 0 {
+		fuzzSex := true
+		fmt.Print(fuzzSex)
+	}
 
 	// set logs
 	log.SetPrefix("sex:")
@@ -224,6 +242,12 @@ func main() {
 	dob = replaceNewLine(dob)
 	t, _ := time.Parse(layoutISO, dob)
 
+	// detect unknown
+	if len(dob) == 0 {
+		fuzzDob := true
+		fmt.Print(fuzzDob)
+	}
+
 	// set logs
 	log.SetPrefix("date of birth:")
 	log.SetFlags(0)
@@ -240,6 +264,12 @@ func main() {
 	comune, _ = reader.ReadString('\n')
 	comune = replaceNewLine(comune)
 	comune = strings.ToUpper(comune)
+
+	// detect unknown
+	if len(comune) == 0 {
+		fuzzComune := true
+		fmt.Print(fuzzComune)
+	}
 
 	// Construct codice fiscale
 
@@ -442,4 +472,20 @@ func createComuneMap() map[string]string {
 	}
 
 	return comuneMap
+}
+
+func fuzzAlphabet() [3]string {
+	var triplet [3]string
+
+	for ch := 'A'; ch <= 'Z'; ch++ {
+		triplet[0] = string(ch)
+		for ch := 'A'; ch <= 'Z'; ch++ {
+			triplet[1] = string(ch)
+			for ch := 'A'; ch <= 'Z'; ch++ {
+				triplet[2] = string(ch)
+				fmt.Print(triplet)
+			}
+		}
+	}
+	return triplet
 }
