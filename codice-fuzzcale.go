@@ -336,27 +336,29 @@ func main() {
 	}
 
 	// calculate single cf with all known values
-	var cf, check string
 	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
 		// construct cf minus check
-		cf = constructCFNoCheck(surname, firstname, birthYear, mCode, day, comuneCode)
-		// calculate check character
-		check = calculateCheck(cf)
-		// print concatenated CF
-		cf = replaceNewLine(cf + check)
-		fmt.Print(cf)
-	} else if fuzzSurname { // if surname unknown
+		constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+	} else { // if known data incomplete
+		// fuzz surname
 		c := make(chan [3]string)
+
 		go fuzzAlphabet(c)
 		for sur := range c {
 			surname = sur[0] + sur[1] + sur[2]
-			// construct cf minus check
-			cf = constructCFNoCheck(surname, firstname, birthYear, mCode, day, comuneCode)
-			// calculate check character
-			check = calculateCheck(cf)
-			// print concatenated CF
-			cf = replaceNewLine(cf + check)
-			fmt.Println(cf)
+
+			if fuzzFirstname {
+				// fuzz firstname
+				c2 := make(chan [3]string)
+				go fuzzAlphabet(c2)
+				for fir := range c2 {
+					firstname = fir[0] + fir[1] + fir[2]
+					// construct cf minus check
+					constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+				}
+			}
+			// construct cf
+			constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
 		}
 	}
 
@@ -524,8 +526,13 @@ func calculateCheck(s string) string {
 	return check
 }
 
-func constructCFNoCheck(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string) string {
+func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string) {
 	// construct cf minus check
 	cf := surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
-	return cf
+	// calculate check character
+	check := calculateCheck(cf)
+	// print concatenated CF
+	cf = replaceNewLine(cf + check)
+	fmt.Println(cf)
+
 }
