@@ -345,7 +345,7 @@ func main() {
 		// print concatenated CF
 		cf = replaceNewLine(cf + check)
 		fmt.Print(cf)
-	} else if fuzzSurname {
+	} else if fuzzSurname { // if surname unknown
 		c := make(chan [3]string)
 		go fuzzAlphabet(c)
 		for sur := range c {

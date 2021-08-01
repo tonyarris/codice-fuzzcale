@@ -1,6 +1,8 @@
 
 # codice-fuzzcale
 
+[![asciicast](https://asciinema.org/a/428246.svg)](https://asciinema.org/a/428246)
+
 codice-fuzzcale is a CLI tool written in Go for generating Italian fiscal codes (codici fiscali) for pentesting Italian web applications such as portals, banking apps etc. 
 
 The fiscal code is a unique identifier for an individual, and is composed of personal data such as name, surname, date of birth, place of birth and sex. 
