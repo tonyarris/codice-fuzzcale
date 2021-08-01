@@ -145,6 +145,9 @@ var rem = map[int]string{
 
 var comuneMap = createComuneMap()
 
+// unknown variable detection bools
+var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune bool
+
 func main() {
 
 	// print title
@@ -153,7 +156,6 @@ func main() {
 	fmt.Println()
 
 	// collect known information from user
-	// TODO - implement unknown functionality
 	fmt.Println("Just hit ENTER for unknown values")
 	// prompt & store surname
 	fmt.Println("Enter surname(s): ")
@@ -168,8 +170,7 @@ func main() {
 
 	// detect unknown
 	if len(surname) == 0 {
-		fuzzSurname := true
-		fmt.Print(fuzzSurname)
+		fuzzSurname = true
 	}
 
 	// set logs
@@ -194,7 +195,7 @@ func main() {
 
 	// detect unknown
 	if len(firstname) == 0 {
-		fuzzFirstname := true
+		fuzzFirstname = true
 		fmt.Print(fuzzFirstname)
 	}
 
@@ -218,7 +219,7 @@ func main() {
 
 	// detect unknown
 	if len(sex) == 0 {
-		fuzzSex := true
+		fuzzSex = true
 		fmt.Print(fuzzSex)
 	}
 
@@ -244,7 +245,7 @@ func main() {
 
 	// detect unknown
 	if len(dob) == 0 {
-		fuzzDob := true
+		fuzzDob = true
 		fmt.Print(fuzzDob)
 	}
 
@@ -267,94 +268,97 @@ func main() {
 
 	// detect unknown
 	if len(comune) == 0 {
-		fuzzComune := true
+		fuzzComune = true
 		fmt.Print(fuzzComune)
 	}
 
-	// Construct codice fiscale
+	// TODO prompt for output file location
 
-	// surname triplet
-	// extract vowels from surname
-	s_vowels := extractVowels(surname)
-	// remove vowels from surname
-	surname = removeVowels(surname)
+	// Construct codice fiscale from known values
 
-	surname = constructTriplet(surname, s_vowels)
+	if !fuzzSurname {
+		// surname triplet
+		// extract vowels from surname
+		s_vowels := extractVowels(surname)
+		// remove vowels from surname
+		surname = removeVowels(surname)
 
-	// name triplet
-	// extract vowels from firstname
-	f_vowels := extractVowels(firstname)
-	// remove vowels from name
-	firstname = removeVowels(firstname)
-
-	// if > 3 consonants in firstname, skip the second
-	var nameTrip []rune = []rune(firstname)
-	if len(firstname) > 3 {
-		nameTrip = delChar(nameTrip, 1)
-	}
-	firstname = string(nameTrip)
-
-	if len(firstname) >= 3 {
-		firstname = firstname[0:3]
+		surname = constructTriplet(surname, s_vowels)
 	}
 
-	firstname = constructTriplet(firstname, f_vowels)
+	if !fuzzFirstname {
+		// name triplet
+		// extract vowels from firstname
+		f_vowels := extractVowels(firstname)
+		// remove vowels from name
+		firstname = removeVowels(firstname)
 
-	// birth year
-	var birthYear int
-	birthYear = t.Year()
-	birthYear = birthYear % 100
+		// if > 3 consonants in firstname, skip the second
+		var nameTrip []rune = []rune(firstname)
+		if len(firstname) > 3 {
+			nameTrip = delChar(nameTrip, 1)
+		}
+		firstname = string(nameTrip)
 
-	// get month code
-	mCode := m[t.Month().String()]
+		if len(firstname) >= 3 {
+			firstname = firstname[0:3]
+		}
 
-	// day of birth
-	// day counter
-	var dayCount int
-	dayCount = 0
-
-	if sex == "F" {
-		dayCount = 40
-	}
-	// actual day of birth, plus 40 for F
-	var day int = t.Day() + dayCount
-
-	// assign comune code
-	comuneCode := comuneMap[comune]
-
-	// calculate check character
-	var cf string = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
-
-	// split into odds & evens
-	runeCF := []rune(cf)
-	var odd string
-	var even string
-
-	for i := 0; i < len(runeCF); i = i + 2 {
-		odd = odd + string(runeCF[i])
-	}
-	for i := 1; i < len(runeCF); i = i + 2 {
-		even = even + string(runeCF[i])
+		firstname = constructTriplet(firstname, f_vowels)
 	}
 
-	// calculate intermediate values
-	runeOdd := []rune(odd)
-	runeEven := []rune(even)
-	var oddValue int
-	var evenValue int
-	for i := 0; i < len(runeOdd); i++ {
-		oddValue = oddValue + oddMap[string(runeOdd[i])]
-	}
-	for i := 0; i < len(runeEven); i++ {
-		evenValue = evenValue + evenMap[string(runeEven[i])]
-	}
-	combinedValue := (oddValue + evenValue) % 26
+	var mCode string
+	var birthYear, day int
+	if !fuzzDob {
+		// birth year
+		birthYear = t.Year()
+		birthYear = birthYear % 100
 
-	check := rem[combinedValue]
+		// get month code
+		mCode = m[t.Month().String()]
 
-	// print concatenated CF
-	cf = replaceNewLine(cf + check)
-	fmt.Print(cf)
+		// day of birth
+		// day counter
+		var dayCount int
+		dayCount = 0
+
+		if sex == "F" {
+			dayCount = 40
+		}
+		// actual day of birth, plus 40 for F
+		day = t.Day() + dayCount
+	}
+
+	var comuneCode string
+	if !fuzzComune {
+		// assign comune code
+		comuneCode = comuneMap[comune]
+	}
+
+	// calculate single cf with all known values
+	var cf, check string
+	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
+		// construct cf minus check
+		cf = constructCFNoCheck(surname, firstname, birthYear, mCode, day, comuneCode)
+		// calculate check character
+		check = calculateCheck(cf)
+		// print concatenated CF
+		cf = replaceNewLine(cf + check)
+		fmt.Print(cf)
+	} else if fuzzSurname {
+		c := make(chan [3]string)
+		go fuzzAlphabet(c)
+		for sur := range c {
+			surname = sur[0] + sur[1] + sur[2]
+			// construct cf minus check
+			cf = constructCFNoCheck(surname, firstname, birthYear, mCode, day, comuneCode)
+			// calculate check character
+			check = calculateCheck(cf)
+			// print concatenated CF
+			cf = replaceNewLine(cf + check)
+			fmt.Println(cf)
+		}
+	}
 
 }
 
@@ -474,7 +478,7 @@ func createComuneMap() map[string]string {
 	return comuneMap
 }
 
-func fuzzAlphabet() [3]string {
+func fuzzAlphabet(c chan [3]string) {
 	var triplet [3]string
 
 	for ch := 'A'; ch <= 'Z'; ch++ {
@@ -483,9 +487,45 @@ func fuzzAlphabet() [3]string {
 			triplet[1] = string(ch)
 			for ch := 'A'; ch <= 'Z'; ch++ {
 				triplet[2] = string(ch)
-				fmt.Print(triplet)
+				c <- triplet
 			}
 		}
 	}
-	return triplet
+	close(c)
+}
+
+func calculateCheck(s string) string {
+	// split into odds & evens
+	runeCF := []rune(s)
+	var odd string
+	var even string
+
+	for i := 0; i < len(runeCF); i = i + 2 {
+		odd = odd + string(runeCF[i])
+	}
+	for i := 1; i < len(runeCF); i = i + 2 {
+		even = even + string(runeCF[i])
+	}
+
+	// calculate intermediate values
+	runeOdd := []rune(odd)
+	runeEven := []rune(even)
+	var oddValue int
+	var evenValue int
+	for i := 0; i < len(runeOdd); i++ {
+		oddValue = oddValue + oddMap[string(runeOdd[i])]
+	}
+	for i := 0; i < len(runeEven); i++ {
+		evenValue = evenValue + evenMap[string(runeEven[i])]
+	}
+	combinedValue := (oddValue + evenValue) % 26
+
+	check := rem[combinedValue]
+	return check
+}
+
+func constructCFNoCheck(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string) string {
+	// construct cf minus check
+	cf := surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
+	return cf
 }
