@@ -143,7 +143,7 @@ var rem = map[int]string{
 	25: "Z",
 }
 
-var comuneMap = createComuneMap()
+var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
 var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune bool
@@ -196,7 +196,6 @@ func main() {
 	// detect unknown
 	if len(firstname) == 0 {
 		fuzzFirstname = true
-		fmt.Print(fuzzFirstname)
 	}
 
 	// set logs
@@ -336,6 +335,7 @@ func main() {
 	}
 
 	// calculate single cf with all known values
+	// TODO separate each fuzzing option to allow a subsection of the cf to be fuzzed
 	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
 		// construct cf minus check
 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
@@ -353,8 +353,19 @@ func main() {
 				go fuzzAlphabet(c2)
 				for fir := range c2 {
 					firstname = fir[0] + fir[1] + fir[2]
-					// construct cf minus check
-					constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+
+					// TODO fuzz date
+
+					// fuzz comune code
+					if fuzzComune {
+						for i, s := range cNames {
+							comuneCode = comuneMap[s]
+							i++
+
+							// construct cf minus check
+							constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+						}
+					}
 				}
 			}
 			// construct cf
@@ -454,7 +465,7 @@ func checkDate(s string) error {
 	}
 }
 
-func createComuneMap() map[string]string {
+func createComuneMap() (map[string]string, []string) {
 	// comune code
 	// read comune names
 	content, err := ioutil.ReadFile("./comune_codes/final_codes/comune_names.txt")
@@ -477,7 +488,7 @@ func createComuneMap() map[string]string {
 		comuneMap[(cNames[i])] = cCodes[i]
 	}
 
-	return comuneMap
+	return comuneMap, cNames
 }
 
 func fuzzAlphabet(c chan [3]string) {
