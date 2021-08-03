@@ -70,6 +70,7 @@ func TestCheckSex(t *testing.T) {
 	}
 }
 
-func TestFuzzName(t *testing.T) {
-	fuzzAlphabet()
+func TestFuzzAlphabet(t *testing.T) {
+	c2 := make(chan [3]string)
+	go fuzzAlphabet(c2)
 }

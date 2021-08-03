@@ -358,10 +358,10 @@ func main() {
 
 					// fuzz comune code
 					if fuzzComune {
-						for i, s := range cNames {
-							comuneCode = comuneMap[s]
-							i++
-
+						c3 := make(chan string)
+						go fuzzComuneCode(c3)
+						for ccode := range c3 {
+							comuneCode = ccode
 							// construct cf minus check
 							constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
 						}
@@ -503,6 +503,14 @@ func fuzzAlphabet(c chan [3]string) {
 				c <- triplet
 			}
 		}
+	}
+	close(c)
+}
+
+func fuzzComuneCode(c chan string) {
+	for i, s := range cNames {
+		c <- comuneMap[s]
+		i++
 	}
 	close(c)
 }
