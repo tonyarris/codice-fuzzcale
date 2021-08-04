@@ -354,7 +354,9 @@ func main() {
 				for fir := range c2 {
 					firstname = fir[0] + fir[1] + fir[2]
 
-					// TODO fuzz date
+					// TODO fuzz sex
+
+					// TODO optimise date fuzz - add timeout. Add range? min/max age user input?
 					if fuzzDob {
 						end := time.Now()
 						start := end.Add(time.Duration(time.Now().Year()) - 80)
