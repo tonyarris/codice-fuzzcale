@@ -355,15 +355,31 @@ func main() {
 					firstname = fir[0] + fir[1] + fir[2]
 
 					// TODO fuzz date
+					if fuzzDob {
+						end := time.Now()
+						start := end.Add(time.Duration(time.Now().Year()) - 80)
+						fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
 
-					// fuzz comune code
-					if fuzzComune {
-						c3 := make(chan string)
-						go fuzzComuneCode(c3)
-						for ccode := range c3 {
-							comuneCode = ccode
-							// construct cf minus check
-							constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+						for rd := rangeDate(end, start); ; {
+							date := rd()
+							if date.IsZero() {
+								break
+							}
+							birthYear = date.Year()
+							birthYear = birthYear % 100
+							day = date.Day()
+							mCode = m[date.Month().String()]
+
+							// fuzz comune code
+							if fuzzComune {
+								c3 := make(chan string)
+								go fuzzComuneCode(c3)
+								for ccode := range c3 {
+									comuneCode = ccode
+									// construct cf minus check
+									constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+								}
+							}
 						}
 					}
 				}
@@ -513,6 +529,23 @@ func fuzzComuneCode(c chan string) {
 		i++
 	}
 	close(c)
+}
+
+// from https://stackoverflow.com/questions/50982524/how-to-gracefully-iterate-a-date-range-in-go
+func rangeDate(start, end time.Time) func() time.Time {
+	y, m, d := start.Date()
+	start = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	y, m, d = end.Date()
+	end = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+
+	return func() time.Time {
+		if start.After(end) {
+			return time.Time{}
+		}
+		date := start
+		start = start.AddDate(0, 0, -1)
+		return date
+	}
 }
 
 func calculateCheck(s string) string {
