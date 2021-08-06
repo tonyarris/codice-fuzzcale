@@ -146,7 +146,8 @@ var rem = map[int]string{
 var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
-var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune bool
+var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge bool
+var maxAgeInYears, minAgeInYears int
 
 func main() {
 
@@ -245,7 +246,20 @@ func main() {
 	// detect unknown
 	if len(dob) == 0 {
 		fuzzDob = true
-		fmt.Print(fuzzDob)
+	}
+
+	// get max/min age if dob unknown
+	if fuzzDob {
+		fmt.Print("Max age:")
+		fmt.Scanf("%d", &maxAgeInYears)
+		if maxAgeInYears > 0 {
+			maxAge = true
+		}
+		fmt.Print("Min age:")
+		fmt.Scanf("%d", &minAgeInYears)
+		if minAgeInYears > 0 {
+			minAge = true
+		}
 	}
 
 	// set logs
@@ -358,8 +372,18 @@ func main() {
 
 					// TODO optimise date fuzz - add timeout. Add range? min/max age user input?
 					if fuzzDob {
-						end := time.Now()
-						start := end.Add(time.Duration(time.Now().Year()) - 80)
+						var start, end time.Time
+						// set start and end time envelope to match min and max age if entered
+						if minAge {
+							start = time.Now().AddDate(-minAgeInYears, 0, 0)
+						} else {
+							start = time.Now()
+						}
+						if maxAge {
+							end = time.Now().AddDate(-maxAgeInYears, 0, 0)
+						} else {
+							end = time.Now().AddDate(-80, 0, 0)
+						}
 						fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
 
 						for rd := rangeDate(end, start); ; {
@@ -533,15 +557,15 @@ func fuzzComuneCode(c chan string) {
 	close(c)
 }
 
-// from https://stackoverflow.com/questions/50982524/how-to-gracefully-iterate-a-date-range-in-go
+// TODO - bottom out at max age
 func rangeDate(start, end time.Time) func() time.Time {
-	y, m, d := start.Date()
+	y, m, d := end.Date()
 	start = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
-	y, m, d = end.Date()
+	y, m, d = start.Date()
 	end = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 
 	return func() time.Time {
-		if start.After(end) {
+		if end.Before(start) {
 			return time.Time{}
 		}
 		date := start
@@ -588,5 +612,4 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	// print concatenated CF
 	cf = replaceNewLine(cf + check)
 	fmt.Println(cf)
-
 }
