@@ -259,6 +259,16 @@ func main() {
 		if minAgeInYears > 0 {
 			minAge = true
 		}
+
+		//set logs
+		log.SetPrefix("Max/min age: ")
+		log.SetFlags(0)
+
+		// validate ages
+		err = checkAges(maxAgeInYears, minAgeInYears)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// set logs
@@ -509,6 +519,14 @@ func checkDate(s string) error {
 		return errors.New("INVALID DOB")
 	} else {
 		return nil
+	}
+}
+
+func checkAges(max int, min int) error {
+	if max > min {
+		return nil
+	} else {
+		return errors.New("INVALID AGE RANGE")
 	}
 }
 

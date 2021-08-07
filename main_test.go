@@ -74,3 +74,19 @@ func TestFuzzAlphabet(t *testing.T) {
 	c2 := make(chan [3]string)
 	go fuzzAlphabet(c2)
 }
+
+func TestCheckAges(t *testing.T) {
+
+	// valid input
+	err := checkAges(2, 1)
+	if err != nil {
+		t.Fatal("checkAges() failure - allows invalid input")
+	}
+
+	// max lower than min
+	err = checkAges(1, 2)
+	if err == nil {
+		t.Fatal("checkAges() failure - allows invalid input")
+	}
+
+}
