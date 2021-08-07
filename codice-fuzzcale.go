@@ -284,7 +284,14 @@ func main() {
 		fmt.Print(fuzzComune)
 	}
 
-	// TODO prompt for output file location
+	// prompt and store outfile
+	fmt.Println("Output path (/path/*.txt): ")
+	path, _ := reader.ReadString('\n')
+	path = replaceNewLine(path)
+
+	// create given file
+	f, err := os.Create(path)
+	defer f.Close()
 
 	// Construct codice fiscale from known values
 
@@ -351,7 +358,7 @@ func main() {
 	// TODO separate each fuzzing option to allow a subsection of the cf to be fuzzed
 	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
 		// construct cf minus check
-		constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
 	} else { // if known data incomplete
 		// fuzz surname
 		c := make(chan [3]string)
@@ -397,8 +404,8 @@ func main() {
 									go fuzzComuneCode(c3)
 									for ccode := range c3 {
 										comuneCode = ccode
-										// construct cf minus check
-										constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+										// construct cf
+										constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
 									}
 								}
 							} else {
@@ -409,7 +416,7 @@ func main() {
 				}
 			}
 			// construct cf
-			constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+			constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
 		}
 	}
 
@@ -598,7 +605,7 @@ func calculateCheck(s string) string {
 	return check
 }
 
-func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string) {
+func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string, f *os.File) {
 	// construct cf minus check
 	cf := surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
 	// calculate check character
@@ -606,6 +613,8 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	// print concatenated CF
 	cf = replaceNewLine(cf + check)
 	fmt.Println(cf)
+	f.WriteString(cf + "\n")
+
 	// fuzz sex
 	if fuzzSex {
 		day = day + 40
@@ -613,5 +622,6 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 		check = calculateCheck(cf)
 		cf = replaceNewLine(cf)
 		fmt.Println(cf + check)
+		f.WriteString(cf + check + "\n")
 	}
 }
