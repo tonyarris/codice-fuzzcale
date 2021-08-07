@@ -220,7 +220,6 @@ func main() {
 	// detect unknown
 	if len(sex) == 0 {
 		fuzzSex = true
-		fmt.Print(fuzzSex)
 	}
 
 	// set logs
@@ -250,12 +249,12 @@ func main() {
 
 	// get max/min age if dob unknown
 	if fuzzDob {
-		fmt.Print("Max age:")
+		fmt.Print("Max age: ")
 		fmt.Scanf("%d", &maxAgeInYears)
 		if maxAgeInYears > 0 {
 			maxAge = true
 		}
-		fmt.Print("Min age:")
+		fmt.Print("Min age: ")
 		fmt.Scanf("%d", &minAgeInYears)
 		if minAgeInYears > 0 {
 			minAge = true
@@ -368,9 +367,6 @@ func main() {
 				for fir := range c2 {
 					firstname = fir[0] + fir[1] + fir[2]
 
-					// TODO fuzz sex
-
-					// TODO optimise date fuzz - add timeout. Add range? min/max age user input?
 					if fuzzDob {
 						var start, end time.Time
 						// set start and end time envelope to match min and max age if entered
@@ -386,25 +382,27 @@ func main() {
 						}
 						fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
 
-						for rd := rangeDate(end, start); ; {
+						for rd := rangeDate(start, end); ; {
 							date := rd()
-							if date.IsZero() {
-								break
-							}
-							birthYear = date.Year()
-							birthYear = birthYear % 100
-							day = date.Day()
-							mCode = m[date.Month().String()]
+							// bottom-out date range
+							if date.Year() <= start.Year() {
+								birthYear = date.Year()
+								birthYear = birthYear % 100
+								day = date.Day()
+								mCode = m[date.Month().String()]
 
-							// fuzz comune code
-							if fuzzComune {
-								c3 := make(chan string)
-								go fuzzComuneCode(c3)
-								for ccode := range c3 {
-									comuneCode = ccode
-									// construct cf minus check
-									constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+								// fuzz comune code
+								if fuzzComune {
+									c3 := make(chan string)
+									go fuzzComuneCode(c3)
+									for ccode := range c3 {
+										comuneCode = ccode
+										// construct cf minus check
+										constructCF(surname, firstname, birthYear, mCode, day, comuneCode)
+									}
 								}
+							} else {
+								break
 							}
 						}
 					}
@@ -557,7 +555,6 @@ func fuzzComuneCode(c chan string) {
 	close(c)
 }
 
-// TODO - bottom out at max age
 func rangeDate(start, end time.Time) func() time.Time {
 	y, m, d := end.Date()
 	start = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
@@ -565,11 +562,8 @@ func rangeDate(start, end time.Time) func() time.Time {
 	end = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 
 	return func() time.Time {
-		if end.Before(start) {
-			return time.Time{}
-		}
 		date := start
-		start = start.AddDate(0, 0, -1)
+		start = start.AddDate(0, 0, 1)
 		return date
 	}
 }
@@ -612,4 +606,12 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	// print concatenated CF
 	cf = replaceNewLine(cf + check)
 	fmt.Println(cf)
+	// fuzz sex
+	if fuzzSex {
+		day = day + 40
+		cf = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
+		check = calculateCheck(cf)
+		cf = replaceNewLine(cf)
+		fmt.Println(cf + check)
+	}
 }
