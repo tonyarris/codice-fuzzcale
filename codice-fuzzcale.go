@@ -146,7 +146,7 @@ var rem = map[int]string{
 var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
-var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge bool
+var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut bool
 var maxAgeInYears, minAgeInYears int
 
 func main() {
@@ -260,14 +260,16 @@ func main() {
 			minAge = true
 		}
 
-		//set logs
-		log.SetPrefix("Max/min age: ")
-		log.SetFlags(0)
+		if minAge && maxAge {
+			//set logs
+			log.SetPrefix("Max/min age: ")
+			log.SetFlags(0)
 
-		// validate ages
-		err = checkAges(maxAgeInYears, minAgeInYears)
-		if err != nil {
-			log.Fatal(err)
+			// validate ages
+			err = checkAges(maxAgeInYears, minAgeInYears)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
@@ -291,17 +293,28 @@ func main() {
 	// detect unknown
 	if len(comune) == 0 {
 		fuzzComune = true
-		fmt.Print(fuzzComune)
 	}
 
 	// prompt and store outfile
-	fmt.Println("Output path (/path/*.txt): ")
+	fmt.Println("Output path (/<PATH>/*.txt): ")
 	path, _ := reader.ReadString('\n')
 	path = replaceNewLine(path)
 
-	// create given file
-	f, err := os.Create(path)
-	defer f.Close()
+	// detect outfile
+	if len(path) > 0 {
+		writeOut = true
+	}
+
+	var f *os.File
+
+	if writeOut {
+		// create given file
+		f, err = os.Create(path)
+		if err != nil {
+			log.Fatal(errors.New("ERROR CREATING OUTFILE"))
+		}
+		defer f.Close()
+	}
 
 	// Construct codice fiscale from known values
 
@@ -437,7 +450,7 @@ func delChar(s []rune, index int) []rune {
 }
 
 func checkName(s string) error {
-	// sanify input
+	// sanitise input
 	// check contains only letters & spaces
 	for _, r := range s {
 		if !unicode.IsLetter(r) {
