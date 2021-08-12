@@ -536,7 +536,7 @@ func checkDate(s string) error {
 }
 
 func checkAges(max int, min int) error {
-	if max > min {
+	if max >= min {
 		return nil
 	} else {
 		return errors.New("INVALID AGE RANGE")
