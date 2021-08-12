@@ -83,6 +83,12 @@ func TestCheckAges(t *testing.T) {
 		t.Fatal("checkAges() failure - allows invalid input")
 	}
 
+	// valid input, ages equal
+	err = checkAges(2, 2)
+	if err != nil {
+		t.Fatal("checkAges() failure - allows invalid input")
+	}
+
 	// max lower than min
 	err = checkAges(1, 2)
 	if err == nil {
