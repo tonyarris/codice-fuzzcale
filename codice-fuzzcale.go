@@ -146,7 +146,7 @@ var rem = map[int]string{
 var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
-var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut bool
+var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut, comuneExist bool
 var maxAgeInYears, minAgeInYears int
 
 func main() {
@@ -374,7 +374,18 @@ func main() {
 	var comuneCode string
 	if !fuzzComune {
 		// assign comune code
-		comuneCode = comuneMap[comune]
+		comuneCode, comuneExist = comuneMap[comune]
+
+		// set logs
+		log.SetPrefix("comune: ")
+		log.SetFlags(0)
+
+		// check if comune exists
+		if !comuneExist {
+			fmt.Print("The comune entered does not exist.\n")
+			err = errors.New("COMUNE ERROR")
+			log.Fatal(err)
+		}
 	}
 
 	// calculate single cf with all known values
