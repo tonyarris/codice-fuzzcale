@@ -265,7 +265,7 @@ func main() {
 			log.SetPrefix("Max/min age: ")
 			log.SetFlags(0)
 
-			// validate ages
+			// validate relative ages min/max
 			err = checkAges(maxAgeInYears, minAgeInYears)
 			if err != nil {
 				log.Fatal(err)
@@ -278,7 +278,7 @@ func main() {
 	log.SetFlags(0)
 
 	// TODO verify birth date format
-	//err = checkDate(dob)
+	// err = checkDate(dob)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
