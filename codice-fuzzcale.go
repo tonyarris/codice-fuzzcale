@@ -149,6 +149,9 @@ var comuneMap, cNames = createComuneMap()
 var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut, comuneExist bool
 var maxAgeInYears, minAgeInYears int
 
+// global CF element vars
+var surname, firstname, sex, dob, comune string
+
 func main() {
 
 	// print title
