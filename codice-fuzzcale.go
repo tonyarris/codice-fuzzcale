@@ -213,6 +213,8 @@ func main() {
 	}
 	firstname = strings.ToUpper(firstname)
 
+	// TODO fix cf for 'AAAAAAAAAAA' input
+
 	// prompt & store sex
 	fmt.Println("Enter sex (M/F):")
 	var sex string
