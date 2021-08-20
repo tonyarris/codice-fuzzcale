@@ -143,6 +143,22 @@ var rem = map[int]string{
 	25: "Z",
 }
 
+// fuzz map
+var funcMap = map[int]string{
+	1: "fuzzAlphabet",
+	2: "fuzzAlphabet",
+	3: "fuzzDob",
+	4: "fuzzComune",
+}
+
+// known map
+var knownMap = map[int]string{
+	1: "surname",
+	2: "firstname",
+	3: "dob",
+	4: "comune",
+}
+
 var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
@@ -398,66 +414,70 @@ func main() {
 	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
 		// construct cf minus check
 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
-	} else { // if known data incomplete
-		// fuzz surname
-		c := make(chan [3]string)
-
-		go fuzzAlphabet(c)
-		for sur := range c {
-			surname = sur[0] + sur[1] + sur[2]
-
-			if fuzzFirstname {
-				// fuzz firstname
-				c2 := make(chan [3]string)
-				go fuzzAlphabet(c2)
-				for fir := range c2 {
-					firstname = fir[0] + fir[1] + fir[2]
-
-					if fuzzDob {
-						var start, end time.Time
-						// set start and end time envelope to match min and max age if entered
-						if minAge {
-							start = time.Now().AddDate(-minAgeInYears, 0, 0)
-						} else {
-							start = time.Now()
-						}
-						if maxAge {
-							end = time.Now().AddDate(-maxAgeInYears, 0, 0)
-						} else {
-							end = time.Now().AddDate(-80, 0, 0)
-						}
-						fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
-
-						for rd := rangeDate(start, end); ; {
-							date := rd()
-							// bottom-out date range
-							if date.Year() <= start.Year() {
-								birthYear = date.Year()
-								birthYear = birthYear % 100
-								day = date.Day()
-								mCode = m[date.Month().String()]
-
-								// fuzz comune code
-								if fuzzComune {
-									c3 := make(chan string)
-									go fuzzComuneCode(c3)
-									for ccode := range c3 {
-										comuneCode = ccode
-										// construct cf
-										constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
-									}
-								}
-							} else {
-								break
-							}
-						}
-					}
-				}
-			}
-			// construct cf
-			constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
-		}
+	} else {
+		fuzzFiscaleTest()
 	}
+
+	// else { // if known data incomplete
+	// 	// fuzz surname
+	// 	c := make(chan [3]string)
+
+	// 	go fuzzAlphabet(c)
+	// 	for sur := range c {
+	// 		surname = sur[0] + sur[1] + sur[2]
+
+	// 		if fuzzFirstname {
+	// 			// fuzz firstname
+	// 			c2 := make(chan [3]string)
+	// 			go fuzzAlphabet(c2)
+	// 			for fir := range c2 {
+	// 				firstname = fir[0] + fir[1] + fir[2]
+
+	// 				if fuzzDob {
+	// 					var start, end time.Time
+	// 					// set start and end time envelope to match min and max age if entered
+	// 					if minAge {
+	// 						start = time.Now().AddDate(-minAgeInYears, 0, 0)
+	// 					} else {
+	// 						start = time.Now()
+	// 					}
+	// 					if maxAge {
+	// 						end = time.Now().AddDate(-maxAgeInYears, 0, 0)
+	// 					} else {
+	// 						end = time.Now().AddDate(-80, 0, 0)
+	// 					}
+	// 					fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
+
+	// 					for rd := rangeDate(start, end); ; {
+	// 						date := rd()
+	// 						// bottom-out date range
+	// 						if date.Year() <= start.Year() {
+	// 							birthYear = date.Year()
+	// 							birthYear = birthYear % 100
+	// 							day = date.Day()
+	// 							mCode = m[date.Month().String()]
+
+	// 							// fuzz comune code
+	// 							if fuzzComune {
+	// 								c3 := make(chan string)
+	// 								go fuzzComuneCode(c3)
+	// 								for ccode := range c3 {
+	// 									comuneCode = ccode
+	// 									// construct cf
+	// 									constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
+	// 								}
+	// 							}
+	// 						} else {
+	// 							break
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 		// construct cf
+	// 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
+	// 	}
+	// }
 
 }
 
@@ -671,4 +691,62 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 		fmt.Println(cf + check)
 		f.WriteString(cf + check + "\n")
 	}
+}
+
+func fuzzFiscaleTest() {
+	var fuzzList []int
+	knownList := []int{1, 2, 3, 4}
+
+	if fuzzSurname {
+		fuzzList = append(fuzzList, 1)
+		for i, v := range knownList {
+			if v == 1 {
+				knownList = RemoveIndex(knownList, i)
+			}
+		}
+
+	}
+	if fuzzFirstname {
+		fuzzList = append(fuzzList, 2)
+		for i, v := range knownList {
+			if v == 2 {
+				knownList = RemoveIndex(knownList, i)
+			}
+		}
+
+	}
+	if fuzzDob {
+		fuzzList = append(fuzzList, 3)
+		for i, v := range knownList {
+			if v == 3 {
+				knownList = RemoveIndex(knownList, i)
+			}
+		}
+
+	}
+	if fuzzComune {
+		fuzzList = append(fuzzList, 4)
+		for i, v := range knownList {
+			if v == 4 {
+				knownList = RemoveIndex(knownList, i)
+			}
+		}
+
+	}
+
+	for i, v := range fuzzList {
+		fmt.Println("unknown: ", funcMap[v])
+		i++
+
+	}
+	for i, v := range knownList {
+		fmt.Println("known: ", knownMap[v])
+		i++
+
+	}
+}
+
+// remove index
+func RemoveIndex(s []int, index int) []int {
+	return append(s[:index], s[index+1:]...)
 }
