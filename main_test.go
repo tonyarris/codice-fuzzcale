@@ -95,18 +95,3 @@ func TestCheckAges(t *testing.T) {
 		t.Fatal("checkAges() failure - allows invalid input")
 	}
 }
-func TestCheckPositive(t *testing.T) {
-
-	// valid input
-	err := checkPositive(2, 1)
-	if err != nil {
-		t.Fatal("checkPositive() failure - allows invalid input")
-	}
-
-	// invalid input
-	err = checkPositive(-2, 0)
-	if err == nil {
-		t.Fatal("checkPositive() failure - allows invalid input")
-	}
-
-}
