@@ -209,6 +209,7 @@ func main() {
 	// check validity
 	err := checkName(surname)
 	if err != nil {
+		flag.PrintDefaults()
 		log.Fatal(err)
 	}
 	surname = strings.ToUpper(surname)
@@ -238,6 +239,7 @@ func main() {
 	// check validity
 	err = checkName(firstname)
 	if err != nil {
+		flag.PrintDefaults()
 		log.Fatal(err)
 	}
 	firstname = strings.ToUpper(firstname)
@@ -266,6 +268,7 @@ func main() {
 	// validate sex
 	err = checkSex(sex)
 	if err != nil {
+		flag.PrintDefaults()
 		log.Fatal(err)
 	}
 
@@ -319,6 +322,7 @@ func main() {
 			// validate relative ages min/max
 			err = checkAges(maxAgeInYears, minAgeInYears)
 			if err != nil {
+				flag.PrintDefaults()
 				log.Fatal(err)
 			}
 		}
@@ -331,6 +335,7 @@ func main() {
 	// TODO verify birth date format
 	// err = checkDate(dob)
 	// if err != nil {
+	// 	flag.PrintDefaults()
 	// 	log.Fatal(err)
 	// }
 
@@ -369,6 +374,7 @@ func main() {
 		// create given file
 		f, err = os.Create(path)
 		if err != nil {
+			flag.PrintDefaults()
 			log.Fatal(errors.New("ERROR CREATING OUTFILE"))
 		}
 		defer f.Close()
@@ -642,6 +648,7 @@ func rangeDate(start, end time.Time) func() time.Time {
 	}
 }
 
+// calculateCheck() calculates and returns the final check digit of the fiscal code
 func calculateCheck(s string) string {
 	// split into odds & evens
 	runeCF := []rune(s)
@@ -672,6 +679,7 @@ func calculateCheck(s string) string {
 	return check
 }
 
+// constructCF() constructs a fiscal code based on complete, known information and fuzzes the sex if necessary
 func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string, f *os.File) {
 	// construct cf minus check
 	cf := surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
