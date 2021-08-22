@@ -392,9 +392,8 @@ func main() {
 	}
 
 	// calculate single cf with all known values
-	// TODO separate each fuzzing option to allow a subsection of the cf to be fuzzed
 	if !fuzzSurname && !fuzzFirstname && !fuzzSex && !fuzzDob && !fuzzComune {
-		// construct cf minus check
+		// construct cf
 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
 	} else {
 
