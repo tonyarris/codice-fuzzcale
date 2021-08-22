@@ -355,8 +355,6 @@ func main() {
 		firstname = constructTripletFirstname(firstname, f_vowels)
 	}
 
-	//var mCode string
-	//var birthYear, day int
 	if !fuzzDob {
 		// birth year
 		birthYear = t.Year()
@@ -400,7 +398,13 @@ func main() {
 		// construct cf minus check
 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
 	} else {
-		fuzzFiscaleTest()
+
+		// establish values to be fuzzed
+		indicator := generateIndicator()
+
+		// generate CFs
+		generateCF(indicator, 0, "")
+
 	}
 
 }
@@ -636,8 +640,11 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	}
 }
 
-func fuzzFiscaleTest() {
-	fmt.Println("Hello from fuzzFiscaleTest")
+// generateIndicator() establishes which values to fuzz and
+// returns a list of binary values to be passed to generateCF():
+// indicator[0] = surname, indicator[1] = name,
+// indicator[2] = dob/sex, indicator[3] = comune
+func generateIndicator() []int {
 	indicator := []int{0, 0, 0, 0}
 
 	if fuzzSurname {
@@ -654,10 +661,17 @@ func fuzzFiscaleTest() {
 	}
 	fmt.Println(indicator)
 
-	recurse(indicator, 0, "")
+	return indicator
 }
 
-func recurse(indicator []int, i int, s string) {
+// generateCF() generates fiscal codes recursively.
+// It takes the indicator list, a counter and a string as input.
+// With each recursion, it checks whether the element is to be
+// fuzzed by consulting the indicator[i] value. If so, it fuzzes
+// that value and calls itself, passing the fuzzed value, concatenated
+// with the string it received. If not, it simply concatenates the input
+// string with the global value provided by the user during runtime.
+func generateCF(indicator []int, i int, s string) {
 	// fmt.Println("recursion ", i)
 	if i == 0 {
 		if indicator[i] == 1 {
@@ -667,10 +681,10 @@ func recurse(indicator []int, i int, s string) {
 			go fuzzAlphabet(c)
 			for sur := range c {
 				surname = sur[0] + sur[1] + sur[2]
-				recurse(indicator, 1, surname)
+				generateCF(indicator, 1, surname)
 			}
 		} else {
-			recurse(indicator, 1, surname)
+			generateCF(indicator, 1, surname)
 		}
 	}
 	if i == 1 {
@@ -681,10 +695,10 @@ func recurse(indicator []int, i int, s string) {
 			for fir := range c2 {
 				firstname = fir[0] + fir[1] + fir[2]
 				composite := s + firstname
-				recurse(indicator, 2, composite)
+				generateCF(indicator, 2, composite)
 			}
 		} else {
-			recurse(indicator, 2, s+firstname)
+			generateCF(indicator, 2, s+firstname)
 		}
 	}
 	if i == 2 {
@@ -701,7 +715,6 @@ func recurse(indicator []int, i int, s string) {
 			} else {
 				end = time.Now().AddDate(-80, 0, 0)
 			}
-			//fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
 			for rd := rangeDate(start, end); ; {
 				daterange := rd()
 				// bottom-out date range
@@ -711,17 +724,18 @@ func recurse(indicator []int, i int, s string) {
 					day := daterange.Day()
 					mCode := m[daterange.Month().String()]
 					composite := s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day)
+					// TODO - fix fuzz sex
 					if fuzzSex {
 						composite = s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day+40)
-						recurse(indicator, 3, composite)
+						generateCF(indicator, 3, composite)
 					}
-					recurse(indicator, 3, composite)
+					generateCF(indicator, 3, composite)
 				} else {
 					break
 				}
 			}
 		} else {
-			recurse(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
+			generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
 		}
 	}
 	if i == 3 {
@@ -738,8 +752,3 @@ func recurse(indicator []int, i int, s string) {
 		}
 	}
 }
-
-// remove index
-// func RemoveIndex(s []int, index int) []int {
-// 	return append(s[:index], s[index+1:]...)
-// }
