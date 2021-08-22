@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -21,6 +22,16 @@ import (
 var surname, firstname, sex, dob, comuneCode, mCode string
 var birthYear, day int
 var f *os.File
+
+// define flags
+var surnamePtr = flag.String("s", "", "Surname")
+var namePtr = flag.String("n", "", "Name")
+var sexPtr = flag.String("sex", "", "Sex")
+var dobPtr = flag.String("d", "", "Date of birth in the format yyyy-mm-dd")
+var comunePtr = flag.String("c", "", "Comune of birth")
+var minPtr = flag.Int("min", 0, "Minimum age")
+var maxPtr = flag.Int("max", 0, "Maximum age")
+var pathPtr = flag.String("p", "", "Output path")
 
 // birth month map
 var m = map[string]string{
@@ -156,17 +167,29 @@ var maxAgeInYears, minAgeInYears int
 
 func main() {
 
+	// parse command line flags
+	flag.Parse()
+
 	// print title
 	title := figure.NewColorFigure("codice FUZZcale", "slant", "red", true)
 	title.Print()
-	fmt.Println()
 
-	// collect known information from user
-	fmt.Println("Just hit ENTER for unknown values")
-	// prompt & store surname
-	fmt.Println("Enter surname(s): ")
+	// prompt if not all flags provided
+	if flag.NFlag() != 5 {
+		// collect known information from user
+		fmt.Println("Just hit ENTER for unknown values")
+	}
+
+	// define reader
 	reader := bufio.NewReader(os.Stdin)
-	surname, _ := reader.ReadString('\n')
+
+	if *surnamePtr == "" {
+		// prompt & store surname, if not passed as flag
+		fmt.Println("Enter surname(s): ")
+		surname, _ = reader.ReadString('\n')
+	} else {
+		surname = *surnamePtr
+	}
 
 	// replace newline
 	surname = replaceNewLine(surname)
@@ -190,9 +213,13 @@ func main() {
 	}
 	surname = strings.ToUpper(surname)
 
-	// prompt & store firstname
-	fmt.Println("Enter firstname(s):")
-	firstname, _ := reader.ReadString('\n')
+	if *namePtr == "" {
+		// prompt & store firstname
+		fmt.Println("Enter firstname(s):")
+		firstname, _ = reader.ReadString('\n')
+	} else {
+		firstname = *namePtr
+	}
 
 	// replace newline
 	firstname = replaceNewLine(firstname)
@@ -217,10 +244,13 @@ func main() {
 
 	// TODO fix cf for 'AAAAAAAAAAA' input
 
-	// prompt & store sex
-	fmt.Println("Enter sex (M/F):")
-	var sex string
-	sex, _ = reader.ReadString('\n')
+	if *sexPtr == "" {
+		// prompt & store sex
+		fmt.Println("Enter sex (M/F):")
+		sex, _ = reader.ReadString('\n')
+	} else {
+		sex = *sexPtr
+	}
 	sex = strings.ToUpper(sex)
 	sex = replaceNewLine(sex)
 
@@ -243,11 +273,16 @@ func main() {
 	const (
 		layoutISO = "2006-01-02"
 	)
-	fmt.Println("Enter date of birth (yyyy-mm-dd):")
-	var dob string
-	dob, _ = reader.ReadString('\n')
-	dob = replaceNewLine(dob)
-	t, _ := time.Parse(layoutISO, dob)
+	if *minPtr == 0 && *maxPtr == 0 {
+		if *dobPtr == "" {
+			fmt.Println("Enter date of birth (yyyy-mm-dd):")
+			// var dob string
+			dob, _ = reader.ReadString('\n')
+		} else {
+			dob = *dobPtr
+		}
+		dob = replaceNewLine(dob)
+	}
 
 	// detect unknown
 	if len(dob) == 0 {
@@ -256,13 +291,22 @@ func main() {
 
 	// get max/min age if dob unknown
 	if fuzzDob {
-		fmt.Print("Max age: ")
-		fmt.Scanf("%d", &maxAgeInYears)
+		if *maxPtr == 0 {
+			fmt.Print("Max age: ")
+			fmt.Scanf("%d", &maxAgeInYears)
+		} else {
+			maxAgeInYears = *maxPtr
+		}
 		if maxAgeInYears > 0 {
 			maxAge = true
 		}
-		fmt.Print("Min age: ")
-		fmt.Scanf("%d", &minAgeInYears)
+
+		if *minPtr == 0 {
+			fmt.Print("Min age: ")
+			fmt.Scanf("%d", &minAgeInYears)
+		} else {
+			minAgeInYears = *minPtr
+		}
 		if minAgeInYears > 0 {
 			minAge = true
 		}
@@ -291,9 +335,13 @@ func main() {
 	// }
 
 	// prompt & store comune
-	fmt.Println("Enter comune of birth:")
 	var comune string
-	comune, _ = reader.ReadString('\n')
+	if *comunePtr == "" {
+		fmt.Println("Enter comune of birth:")
+		comune, _ = reader.ReadString('\n')
+	} else {
+		comune = *comunePtr
+	}
 	comune = replaceNewLine(comune)
 	comune = strings.ToUpper(comune)
 
@@ -302,9 +350,14 @@ func main() {
 		fuzzComune = true
 	}
 
-	// prompt and store outfile
-	fmt.Println("Output path (/<PATH>/*.txt): ")
-	path, _ := reader.ReadString('\n')
+	// prompt and store output path
+	var path string
+	if *pathPtr == "" {
+		fmt.Println("Output path (/<PATH>/*.txt): ")
+		path, _ = reader.ReadString('\n')
+	} else {
+		path = *pathPtr
+	}
 	path = replaceNewLine(path)
 
 	// detect outfile
@@ -355,6 +408,8 @@ func main() {
 	}
 
 	if !fuzzDob {
+		t, _ := time.Parse(layoutISO, dob)
+
 		// birth year
 		birthYear = t.Year()
 		birthYear = birthYear % 100
