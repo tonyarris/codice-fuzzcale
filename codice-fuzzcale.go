@@ -17,6 +17,10 @@ import (
 	"github.com/common-nighthawk/go-figure"
 )
 
+// global CF element vars
+var surname, firstname, sex, dob, comuneCode, mCode string
+var birthYear, day int
+
 // birth month map
 var m = map[string]string{
 	"January":   "A",
@@ -143,30 +147,11 @@ var rem = map[int]string{
 	25: "Z",
 }
 
-// fuzz map
-var funcMap = map[int]string{
-	1: "fuzzAlphabet",
-	2: "fuzzAlphabet",
-	3: "fuzzDob",
-	4: "fuzzComune",
-}
-
-// known map
-var knownMap = map[int]string{
-	1: "surname",
-	2: "firstname",
-	3: "dob",
-	4: "comune",
-}
-
 var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
 var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut, comuneExist bool
 var maxAgeInYears, minAgeInYears int
-
-// global CF element vars
-var surname, firstname, sex, dob, comune string
 
 func main() {
 
@@ -346,7 +331,7 @@ func main() {
 		// remove vowels from surname
 		surname = removeVowels(surname)
 
-		surname = constructTriplet(surname, s_vowels)
+		surname = constructTripletSurname(surname, s_vowels)
 	}
 
 	if !fuzzFirstname {
@@ -367,11 +352,11 @@ func main() {
 			firstname = firstname[0:3]
 		}
 
-		firstname = constructTriplet(firstname, f_vowels)
+		firstname = constructTripletFirstname(firstname, f_vowels)
 	}
 
-	var mCode string
-	var birthYear, day int
+	//var mCode string
+	//var birthYear, day int
 	if !fuzzDob {
 		// birth year
 		birthYear = t.Year()
@@ -392,7 +377,7 @@ func main() {
 		day = t.Day() + dayCount
 	}
 
-	var comuneCode string
+	// var comuneCode string
 	if !fuzzComune {
 		// assign comune code
 		comuneCode, comuneExist = comuneMap[comune]
@@ -417,67 +402,6 @@ func main() {
 	} else {
 		fuzzFiscaleTest()
 	}
-
-	// else { // if known data incomplete
-	// 	// fuzz surname
-	// 	c := make(chan [3]string)
-
-	// 	go fuzzAlphabet(c)
-	// 	for sur := range c {
-	// 		surname = sur[0] + sur[1] + sur[2]
-
-	// 		if fuzzFirstname {
-	// 			// fuzz firstname
-	// 			c2 := make(chan [3]string)
-	// 			go fuzzAlphabet(c2)
-	// 			for fir := range c2 {
-	// 				firstname = fir[0] + fir[1] + fir[2]
-
-	// 				if fuzzDob {
-	// 					var start, end time.Time
-	// 					// set start and end time envelope to match min and max age if entered
-	// 					if minAge {
-	// 						start = time.Now().AddDate(-minAgeInYears, 0, 0)
-	// 					} else {
-	// 						start = time.Now()
-	// 					}
-	// 					if maxAge {
-	// 						end = time.Now().AddDate(-maxAgeInYears, 0, 0)
-	// 					} else {
-	// 						end = time.Now().AddDate(-80, 0, 0)
-	// 					}
-	// 					fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
-
-	// 					for rd := rangeDate(start, end); ; {
-	// 						date := rd()
-	// 						// bottom-out date range
-	// 						if date.Year() <= start.Year() {
-	// 							birthYear = date.Year()
-	// 							birthYear = birthYear % 100
-	// 							day = date.Day()
-	// 							mCode = m[date.Month().String()]
-
-	// 							// fuzz comune code
-	// 							if fuzzComune {
-	// 								c3 := make(chan string)
-	// 								go fuzzComuneCode(c3)
-	// 								for ccode := range c3 {
-	// 									comuneCode = ccode
-	// 									// construct cf
-	// 									constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
-	// 								}
-	// 							}
-	// 						} else {
-	// 							break
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 		// construct cf
-	// 		constructCF(surname, firstname, birthYear, mCode, day, comuneCode, f)
-	// 	}
-	// }
 
 }
 
@@ -517,7 +441,7 @@ func extractVowels(s string) string {
 	return s
 }
 
-func constructTriplet(s, v string) string {
+func constructTripletSurname(s, v string) string {
 	if len(s) >= 3 {
 		s = s[0:3]
 	} else {
@@ -528,6 +452,22 @@ func constructTriplet(s, v string) string {
 			s = s[0:3]
 		}
 	}
+	surname = s
+	return s
+}
+
+func constructTripletFirstname(s, v string) string {
+	if len(s) >= 3 {
+		s = s[0:3]
+	} else {
+		s = s + v
+		// if < 3 letters total, fill with X
+		if len(s) > 0 && len(s) < 3 {
+			s = s + "XX"
+			s = s[0:3]
+		}
+	}
+	firstname = s
 	return s
 }
 func replaceNewLine(s string) string {
@@ -630,14 +570,17 @@ func fuzzComuneCode(c chan string) {
 }
 
 func rangeDate(start, end time.Time) func() time.Time {
-	y, m, d := end.Date()
-	start = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
-	y, m, d = start.Date()
-	end = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	y, month, d := end.Date()
+	start = time.Date(y, month, d, 0, 0, 0, 0, time.UTC)
+	y, month, d = start.Date()
+	end = time.Date(y, month, d, 0, 0, 0, 0, time.UTC)
 
 	return func() time.Time {
 		date := start
 		start = start.AddDate(0, 0, 1)
+		birthYear = birthYear % 100
+		day = date.Day()
+		mCode = m[date.Month().String()]
 		return date
 	}
 }
@@ -694,59 +637,109 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 }
 
 func fuzzFiscaleTest() {
-	var fuzzList []int
-	knownList := []int{1, 2, 3, 4}
+	fmt.Println("Hello from fuzzFiscaleTest")
+	indicator := []int{0, 0, 0, 0}
 
 	if fuzzSurname {
-		fuzzList = append(fuzzList, 1)
-		for i, v := range knownList {
-			if v == 1 {
-				knownList = RemoveIndex(knownList, i)
-			}
-		}
-
+		indicator[0] = 1
 	}
 	if fuzzFirstname {
-		fuzzList = append(fuzzList, 2)
-		for i, v := range knownList {
-			if v == 2 {
-				knownList = RemoveIndex(knownList, i)
-			}
-		}
-
+		indicator[1] = 1
 	}
 	if fuzzDob {
-		fuzzList = append(fuzzList, 3)
-		for i, v := range knownList {
-			if v == 3 {
-				knownList = RemoveIndex(knownList, i)
-			}
-		}
-
+		indicator[2] = 1
 	}
 	if fuzzComune {
-		fuzzList = append(fuzzList, 4)
-		for i, v := range knownList {
-			if v == 4 {
-				knownList = RemoveIndex(knownList, i)
+		indicator[3] = 1
+	}
+	fmt.Println(indicator)
+
+	recurse(indicator, 0, "")
+}
+
+func recurse(indicator []int, i int, s string) {
+	// fmt.Println("recursion ", i)
+	if i == 0 {
+		if indicator[i] == 1 {
+			// fuzz surname
+			c := make(chan [3]string)
+
+			go fuzzAlphabet(c)
+			for sur := range c {
+				surname = sur[0] + sur[1] + sur[2]
+				recurse(indicator, 1, surname)
 			}
+		} else {
+			recurse(indicator, 1, surname)
 		}
-
 	}
-
-	for i, v := range fuzzList {
-		fmt.Println("unknown: ", funcMap[v])
-		i++
-
+	if i == 1 {
+		if indicator[i] == 1 {
+			//fuzz firstname
+			c2 := make(chan [3]string)
+			go fuzzAlphabet(c2)
+			for fir := range c2 {
+				firstname = fir[0] + fir[1] + fir[2]
+				composite := s + firstname
+				recurse(indicator, 2, composite)
+			}
+		} else {
+			recurse(indicator, 2, s+firstname)
+		}
 	}
-	for i, v := range knownList {
-		fmt.Println("known: ", knownMap[v])
-		i++
-
+	if i == 2 {
+		if indicator[i] == 1 {
+			var start, end time.Time
+			// set start and end time envelope to match min and max age if entered
+			if minAge {
+				start = time.Now().AddDate(-minAgeInYears, 0, 0)
+			} else {
+				start = time.Now()
+			}
+			if maxAge {
+				end = time.Now().AddDate(-maxAgeInYears, 0, 0)
+			} else {
+				end = time.Now().AddDate(-80, 0, 0)
+			}
+			//fmt.Println(start.Format("2006-01-02"), "-", end.Format("2006-01-02"))
+			for rd := rangeDate(start, end); ; {
+				daterange := rd()
+				// bottom-out date range
+				if daterange.Year() <= start.Year() {
+					birthYear := daterange.Year()
+					birthYear = birthYear % 100
+					day := daterange.Day()
+					mCode := m[daterange.Month().String()]
+					composite := s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day)
+					if fuzzSex {
+						composite = s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day+40)
+						recurse(indicator, 3, composite)
+					}
+					recurse(indicator, 3, composite)
+				} else {
+					break
+				}
+			}
+		} else {
+			recurse(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
+		}
+	}
+	if i == 3 {
+		if indicator[i] == 1 {
+			c3 := make(chan string)
+			go fuzzComuneCode(c3)
+			for ccode := range c3 {
+				composite := s + ccode
+				cf := composite + calculateCheck(composite)
+				fmt.Println(cf)
+			}
+		} else {
+			fmt.Println(s + comuneCode + calculateCheck(s+comuneCode))
+		}
 	}
 }
 
 // remove index
-func RemoveIndex(s []int, index int) []int {
-	return append(s[:index], s[index+1:]...)
-}
+// func RemoveIndex(s []int, index int) []int {
+// 	return append(s[:index], s[index+1:]...)
+// }
