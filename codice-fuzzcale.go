@@ -20,6 +20,7 @@ import (
 // global CF element vars
 var surname, firstname, sex, dob, comuneCode, mCode string
 var birthYear, day int
+var f *os.File
 
 // birth month map
 var m = map[string]string{
@@ -310,8 +311,6 @@ func main() {
 	if len(path) > 0 {
 		writeOut = true
 	}
-
-	var f *os.File
 
 	if writeOut {
 		// create given file
@@ -653,7 +652,7 @@ func generateIndicator() []int {
 	if fuzzFirstname {
 		indicator[1] = 1
 	}
-	if fuzzDob {
+	if fuzzDob || fuzzSex {
 		indicator[2] = 1
 	}
 	if fuzzComune {
@@ -746,9 +745,14 @@ func generateCF(indicator []int, i int, s string) {
 				composite := s + ccode
 				cf := composite + calculateCheck(composite)
 				fmt.Println(cf)
+				if writeOut {
+					f.WriteString(cf + "\n")
+				}
 			}
 		} else {
-			fmt.Println(s + comuneCode + calculateCheck(s+comuneCode))
+			cf := s + comuneCode + calculateCheck(s+comuneCode)
+			fmt.Println(cf)
+			f.WriteString(cf + "\n")
 		}
 	}
 }
