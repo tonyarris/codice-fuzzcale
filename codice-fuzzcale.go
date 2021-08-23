@@ -388,6 +388,7 @@ func main() {
 		surname = removeVowels(surname)
 
 		surname = constructTripletSurname(surname, s_vowels)
+		surname = surname[:3]
 	}
 
 	if !fuzzFirstname {
@@ -409,6 +410,7 @@ func main() {
 		}
 
 		firstname = constructTripletFirstname(firstname, f_vowels)
+		firstname = firstname[:3]
 	}
 
 	if !fuzzDob {
