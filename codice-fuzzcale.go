@@ -30,7 +30,7 @@ var dobPtr = flag.String("d", "", "Date of birth in the format yyyy-mm-dd")
 var comunePtr = flag.String("c", "", "Comune of birth")
 var minPtr = flag.Int("min", 0, "Minimum age")
 var maxPtr = flag.Int("max", 0, "Maximum age")
-var pathPtr = flag.String("p", "", "Output path")
+var pathPtr = flag.String("o", "", "Output path")
 
 // birth month map
 var m = map[string]string{
@@ -687,7 +687,7 @@ func calculateCheck(s string) string {
 	return check
 }
 
-// constructCF() constructs a fiscal code based on complete, known information and fuzzes the sex if necessary
+// constructCF() constructs a fiscal code based on complete, known information
 func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string, f *os.File) {
 	// construct cf minus check
 	cf := surname + firstname + fmt.Sprintf("%02d", birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
@@ -697,16 +697,6 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	cf = replaceNewLine(cf + check)
 	fmt.Println(cf)
 	f.WriteString(cf + "\n")
-
-	// fuzz sex
-	if fuzzSex {
-		day = day + 40
-		cf = surname + firstname + fmt.Sprintf("%02d", birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
-		check = calculateCheck(cf)
-		cf = replaceNewLine(cf)
-		fmt.Println(cf + check)
-		f.WriteString(cf + check + "\n")
-	}
 }
 
 // generateIndicator() establishes which values to fuzz and
