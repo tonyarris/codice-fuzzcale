@@ -818,6 +818,8 @@ func generateCF(indicator []int, i int, s string) {
 			generateCF(indicator, 4, composite)
 			composite = s + fmt.Sprintf("%02d", day)
 			generateCF(indicator, 4, composite)
+		} else {
+			generateCF(indicator, 4, s)
 		}
 	}
 	if i == 4 {
