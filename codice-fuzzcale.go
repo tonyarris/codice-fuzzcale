@@ -10,7 +10,6 @@ import (
 	"os"
 	"regexp"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -691,7 +690,7 @@ func calculateCheck(s string) string {
 // constructCF() constructs a fiscal code based on complete, known information and fuzzes the sex if necessary
 func constructCF(surname string, firstname string, birthYear int, mCode string, day int, comuneCode string, f *os.File) {
 	// construct cf minus check
-	cf := surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
+	cf := surname + firstname + fmt.Sprintf("%02d", birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
 	// calculate check character
 	check := calculateCheck(cf)
 	// print concatenated CF
@@ -702,7 +701,7 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 	// fuzz sex
 	if fuzzSex {
 		day = day + 40
-		cf = surname + firstname + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
+		cf = surname + firstname + fmt.Sprintf("%02d", birthYear) + mCode + fmt.Sprintf("%02d", day) + comuneCode
 		check = calculateCheck(cf)
 		cf = replaceNewLine(cf)
 		fmt.Println(cf + check)
@@ -743,7 +742,6 @@ func generateIndicator() []int {
 // with the string it received. If not, it simply concatenates the input
 // string with the global value provided by the user during runtime.
 func generateCF(indicator []int, i int, s string) {
-	// fmt.Println("recursion ", i)
 	if i == 0 {
 		if indicator[i] == 1 {
 			// fuzz surname
@@ -795,10 +793,10 @@ func generateCF(indicator []int, i int, s string) {
 					day := daterange.Day()
 					mCode := m[daterange.Month().String()]
 					if !fuzzSex {
-						composite := s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day)
+						composite := s + fmt.Sprintf("%02d", birthYear) + mCode + fmt.Sprintf("%02d", day)
 						generateCF(indicator, 3, composite)
 					} else {
-						composite := s + strconv.Itoa(birthYear) + mCode
+						composite := s + fmt.Sprintf("%02d", birthYear) + mCode
 						generateCF(indicator, 3, composite)
 					}
 				} else {
@@ -807,14 +805,13 @@ func generateCF(indicator []int, i int, s string) {
 			}
 		} else {
 			if fuzzSex {
-				generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode)
+				generateCF(indicator, 3, s+fmt.Sprintf("%02d", birthYear)+mCode)
 			} else {
-				generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
+				generateCF(indicator, 3, s+fmt.Sprintf("%02d", birthYear)+mCode+fmt.Sprintf("%02d", day))
 			}
 		}
 	}
 	if i == 3 {
-		// TODO - fix fuzz sex
 		if fuzzSex {
 			composite := s + fmt.Sprintf("%02d", day+40)
 			generateCF(indicator, 4, composite)
