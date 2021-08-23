@@ -95,3 +95,11 @@ func TestCheckAges(t *testing.T) {
 		t.Fatal("checkAges() failure - allows invalid input")
 	}
 }
+
+func TestExtractVowels(t *testing.T) {
+	name := "AAAAAAAAAAAAAAAAA"
+	name = extractVowels(name)
+	if len(name) != 3 {
+		t.Fatal("extractVowels returns string of length >3")
+	}
+}

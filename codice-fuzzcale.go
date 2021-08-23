@@ -244,8 +244,6 @@ func main() {
 	}
 	firstname = strings.ToUpper(firstname)
 
-	// TODO fix cf for 'AAAAAAAAAAA' input
-
 	if *sexPtr == "" {
 		// prompt & store sex
 		fmt.Println("Enter sex (M/F):")
@@ -500,7 +498,9 @@ func extractVowels(s string) string {
 	for _, c := range []string{"B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"} {
 
 		s = strings.ReplaceAll(s, c, "")
-		s = s[:3]
+		if len(s) > 3 {
+			s = s[:3]
+		}
 	}
 	return s
 }
