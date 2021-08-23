@@ -712,7 +712,7 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 // generateIndicator() establishes which values to fuzz and
 // returns a list of binary values to be passed to generateCF():
 // indicator[0] = surname, indicator[1] = name,
-// indicator[2] = dob/sex, indicator[3] = comune
+// indicator[2] = dob, indicator[3] = sex, indicator[4] = comune
 func generateIndicator() []int {
 	indicator := []int{0, 0, 0, 0, 0}
 
