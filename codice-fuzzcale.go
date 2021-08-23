@@ -713,7 +713,7 @@ func constructCF(surname string, firstname string, birthYear int, mCode string, 
 // indicator[0] = surname, indicator[1] = name,
 // indicator[2] = dob/sex, indicator[3] = comune
 func generateIndicator() []int {
-	indicator := []int{0, 0, 0, 0}
+	indicator := []int{0, 0, 0, 0, 0}
 
 	if fuzzSurname {
 		indicator[0] = 1
@@ -721,14 +721,15 @@ func generateIndicator() []int {
 	if fuzzFirstname {
 		indicator[1] = 1
 	}
-	if fuzzDob || fuzzSex {
+	if fuzzDob {
 		indicator[2] = 1
 	}
-	if fuzzComune {
+	if fuzzSex {
 		indicator[3] = 1
 	}
-	fmt.Println(indicator)
-
+	if fuzzComune {
+		indicator[4] = 1
+	}
 	return indicator
 }
 
@@ -791,22 +792,35 @@ func generateCF(indicator []int, i int, s string) {
 					birthYear = birthYear % 100
 					day := daterange.Day()
 					mCode := m[daterange.Month().String()]
-					composite := s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day)
-					// TODO - fix fuzz sex
-					if fuzzSex {
-						composite = s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day+40)
+					if !fuzzSex {
+						composite := s + strconv.Itoa(birthYear) + mCode + fmt.Sprintf("%02d", day)
+						generateCF(indicator, 3, composite)
+					} else {
+						composite := s + strconv.Itoa(birthYear) + mCode
 						generateCF(indicator, 3, composite)
 					}
-					generateCF(indicator, 3, composite)
 				} else {
 					break
 				}
 			}
 		} else {
-			generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
+			if fuzzSex {
+				generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode)
+			} else {
+				generateCF(indicator, 3, s+strconv.Itoa(birthYear)+mCode+fmt.Sprintf("%02d", day))
+			}
 		}
 	}
 	if i == 3 {
+		// TODO - fix fuzz sex
+		if fuzzSex {
+			composite := s + fmt.Sprintf("%02d", day+40)
+			generateCF(indicator, 4, composite)
+			composite = s + fmt.Sprintf("%02d", day)
+			generateCF(indicator, 4, composite)
+		}
+	}
+	if i == 4 {
 		if indicator[i] == 1 {
 			c3 := make(chan string)
 			go fuzzComuneCode(c3)
