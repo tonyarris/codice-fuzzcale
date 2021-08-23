@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -104,12 +103,9 @@ func TestExtractVowels(t *testing.T) {
 		t.Fatal("extractVowels returns string of length >3")
 	}
 
-	// TODO: FIX UNEXPECTED BEHAVIOUR
-	name2 := "ARIHRIR"
+	name2 := "MISSISSIPPI"
 	name2 = extractVowels(name2)
 	if len(name2) != 3 {
-		fmt.Println(len(name2))
-		fmt.Println(name2)
 		t.Fatal("extractVowels returns vowel string of incorrect length")
 	}
 }

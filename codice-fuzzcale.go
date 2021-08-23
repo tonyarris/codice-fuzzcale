@@ -495,12 +495,18 @@ func removeVowels(s string) string {
 }
 
 func extractVowels(s string) string {
-	for _, c := range []string{"B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"} {
-
-		s = strings.ReplaceAll(s, c, "")
-		if len(s) > 3 {
-			s = s[:3]
+	sRuneIn := []rune(s)
+	var sRuneOut []rune
+	for i, v := range sRuneIn {
+		switch v {
+		case 'A', 'E', 'I', 'O', 'U':
+			sRuneOut = append(sRuneOut, sRuneIn[i])
 		}
+	}
+
+	s = string(sRuneOut)
+	if len(s) > 3 {
+		s = s[:3]
 	}
 	return s
 }
