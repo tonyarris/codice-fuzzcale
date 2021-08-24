@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -305,7 +306,9 @@ func main() {
 	if fuzzDob {
 		if *maxPtr == 0 {
 			fmt.Print("Max age: ")
-			fmt.Scanf("%d", &maxAgeInYears)
+			maxAgeString, _ := reader.ReadString('\n')
+			maxAgeString = replaceNewLine(maxAgeString)
+			maxAgeInYears, _ = strconv.Atoi(maxAgeString)
 		} else {
 			maxAgeInYears = *maxPtr
 		}
@@ -315,7 +318,9 @@ func main() {
 
 		if *minPtr == 0 {
 			fmt.Print("Min age: ")
-			fmt.Scanf("%d", &minAgeInYears)
+			minAgeString, _ := reader.ReadString('\n')
+			minAgeString = replaceNewLine(minAgeString)
+			minAgeInYears, _ = strconv.Atoi(minAgeString)
 		} else {
 			minAgeInYears = *minPtr
 		}
