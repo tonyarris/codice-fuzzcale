@@ -4,8 +4,7 @@ import (
 	"testing"
 )
 
-// test checkName
-func TestValidName(t *testing.T) {
+func TestCheckName(t *testing.T) {
 	// valid name
 	err := checkName("marcus")
 	if err != nil {
@@ -107,5 +106,35 @@ func TestExtractVowels(t *testing.T) {
 	name2 = extractVowels(name2)
 	if len(name2) != 3 {
 		t.Fatal("extractVowels returns vowel string of incorrect length")
+	}
+}
+
+func TestCheckDate(t *testing.T) {
+	// valid date
+	d := "2000-12-01"
+	err := checkDate(d)
+	if err != nil {
+		t.Fatal("checkDate() error - valid date not allowed")
+	}
+
+	// invalid date
+	d = "2000-31-01"
+	err = checkDate(d)
+	if err == nil {
+		t.Fatal("checkDate() error - invalid date allowed")
+	}
+
+	// invalid date
+	d = "31-01-2000"
+	err = checkDate(d)
+	if err == nil {
+		t.Fatal("checkDate() error - invalid date allowed")
+	}
+
+	// invalid date
+	d = "31st Jan 2000"
+	err = checkDate(d)
+	if err == nil {
+		t.Fatal("checkDate() error - invalid date allowed")
 	}
 }

@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -330,11 +329,11 @@ func main() {
 	log.SetFlags(0)
 
 	// TODO verify birth date format
-	// err = checkDate(dob)
-	// if err != nil {
-	// 	flag.PrintDefaults()
-	// 	log.Fatal(err)
-	// }
+	err = checkDate(dob)
+	if err != nil {
+		flag.PrintDefaults()
+		log.Fatal(err)
+	}
 
 	// prompt & store comune
 	var comune string
@@ -570,12 +569,12 @@ func checkSex(s string) error {
 	}
 }
 
-// TODO - fix check
 func checkDate(s string) error {
-	fmt.Print(s)
-	reg, _ := regexp.Compile(`/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/`)
-	matched := reg.MatchString(s)
-	if !matched {
+	const (
+		layoutISO = "2006-01-02"
+	)
+	_, err := time.Parse(layoutISO, s)
+	if err != nil {
 		return errors.New("INVALID DOB")
 	} else {
 		return nil
