@@ -288,6 +288,19 @@ func main() {
 		fuzzDob = true
 	}
 
+	// validate dob if entered
+	if len(dob) > 0 {
+		// set logs
+		log.SetPrefix("date of birth:")
+		log.SetFlags(0)
+
+		err = checkDate(dob)
+		if err != nil {
+			flag.PrintDefaults()
+			log.Fatal(err)
+		}
+	}
+
 	// get max/min age if dob unknown
 	if fuzzDob {
 		if *maxPtr == 0 {
@@ -322,17 +335,6 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-	}
-
-	// set logs
-	log.SetPrefix("date of birth:")
-	log.SetFlags(0)
-
-	// TODO verify birth date format
-	err = checkDate(dob)
-	if err != nil {
-		flag.PrintDefaults()
-		log.Fatal(err)
 	}
 
 	// prompt & store comune
