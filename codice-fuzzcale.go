@@ -18,8 +18,8 @@ import (
 )
 
 // global CF element vars
-var surname, firstname, sex, dob, comuneCode, mCode string
-var birthYear, day int
+var surname, firstname, sex, dob, comuneCode, mCode, comune, path string
+var birthYear, day, maxAgeInYears, minAgeInYears int
 var f *os.File
 
 // define flags
@@ -162,225 +162,164 @@ var comuneMap, cNames = createComuneMap()
 
 // unknown variable detection bools
 var fuzzSurname, fuzzFirstname, fuzzSex, fuzzDob, fuzzComune, maxAge, minAge, writeOut, comuneExist bool
-var maxAgeInYears, minAgeInYears int
 
 func main() {
 
 	// parse command line flags
 	flag.Parse()
 
-	// print title
-	title := figure.NewColorFigure("codice FUZZcale", "slant", "red", true)
-	title.Print()
-
-	// prompt if not all flags provided
-	if flag.NFlag() != 5 {
-		// collect known information from user
-		fmt.Println("Just hit ENTER for unknown values")
-	}
-
-	// define reader
-	reader := bufio.NewReader(os.Stdin)
-
-	if *surnamePtr == "" {
-		// prompt & store surname, if not passed as flag
-		fmt.Println("Enter surname(s): ")
-		surname, _ = reader.ReadString('\n')
+	// if no flags passed, gather all info
+	if flag.NFlag() == 0 {
+		gatherInfo()
+		// otherwise, assign flags to values
 	} else {
-		surname = *surnamePtr
-	}
+		if *surnamePtr != "" {
+			surname = *surnamePtr
+			// replace newline
+			surname = replaceNewLine(surname)
 
-	// replace newline
-	surname = replaceNewLine(surname)
+			// strip spaces
+			surname = stripSpace(surname)
 
-	// strip spaces
-	surname = stripSpace(surname)
+			// set logs
+			log.SetPrefix("surname: ")
+			log.SetFlags(0)
 
-	// detect unknown
-	if len(surname) == 0 {
-		fuzzSurname = true
-	}
-
-	// set logs
-	log.SetPrefix("surname: ")
-	log.SetFlags(0)
-
-	// check validity
-	err := checkName(surname)
-	if err != nil {
-		flag.PrintDefaults()
-		log.Fatal(err)
-	}
-	surname = strings.ToUpper(surname)
-
-	if *namePtr == "" {
-		// prompt & store firstname
-		fmt.Println("Enter firstname(s):")
-		firstname, _ = reader.ReadString('\n')
-	} else {
-		firstname = *namePtr
-	}
-
-	// replace newline
-	firstname = replaceNewLine(firstname)
-	// strip spaces
-	firstname = stripSpace(firstname)
-
-	// detect unknown
-	if len(firstname) == 0 {
-		fuzzFirstname = true
-	}
-
-	// set logs
-	log.SetPrefix("firstname:")
-	log.SetFlags(0)
-
-	// check validity
-	err = checkName(firstname)
-	if err != nil {
-		flag.PrintDefaults()
-		log.Fatal(err)
-	}
-	firstname = strings.ToUpper(firstname)
-
-	if *sexPtr == "" {
-		// prompt & store sex
-		fmt.Println("Enter sex (M/F):")
-		sex, _ = reader.ReadString('\n')
-	} else {
-		sex = *sexPtr
-	}
-	sex = strings.ToUpper(sex)
-	sex = replaceNewLine(sex)
-
-	// detect unknown
-	if len(sex) == 0 {
-		fuzzSex = true
-	}
-
-	// set logs
-	log.SetPrefix("sex:")
-	log.SetFlags(0)
-
-	// validate sex
-	err = checkSex(sex)
-	if err != nil {
-		flag.PrintDefaults()
-		log.Fatal(err)
-	}
-
-	// prompt & store DOB
-	const (
-		layoutISO = "2006-01-02"
-	)
-	if *minPtr == 0 && *maxPtr == 0 {
-		if *dobPtr == "" {
-			fmt.Println("Enter date of birth (yyyy-mm-dd):")
-			// var dob string
-			dob, _ = reader.ReadString('\n')
+			// check validity
+			err := checkName(surname)
+			if err != nil {
+				flag.PrintDefaults()
+				log.Fatal(err)
+			}
+			surname = strings.ToUpper(surname)
 		} else {
+			fuzzSurname = true
+		}
+
+		if *namePtr != "" {
+			firstname = *namePtr
+
+			// replace newline
+			firstname = replaceNewLine(firstname)
+			// strip spaces
+			firstname = stripSpace(firstname)
+
+			// set logs
+			log.SetPrefix("firstname:")
+			log.SetFlags(0)
+
+			// check validity
+			err := checkName(firstname)
+			if err != nil {
+				flag.PrintDefaults()
+				log.Fatal(err)
+			}
+			firstname = strings.ToUpper(firstname)
+		} else {
+			fuzzFirstname = true
+		}
+
+		if *sexPtr != "" {
+
+			sex = *sexPtr
+
+			sex = strings.ToUpper(sex)
+			sex = replaceNewLine(sex)
+
+			// set logs
+			log.SetPrefix("sex:")
+			log.SetFlags(0)
+
+			// validate sex
+			err := checkSex(sex)
+			if err != nil {
+				flag.PrintDefaults()
+				log.Fatal(err)
+			}
+		} else {
+			fuzzSex = true
+		}
+
+		// prompt & store DOB
+		const (
+			layoutISO = "2006-01-02"
+		)
+		if *dobPtr != "" {
+
 			dob = *dobPtr
-		}
-		dob = replaceNewLine(dob)
-	}
 
-	// detect unknown
-	if len(dob) == 0 {
-		fuzzDob = true
-	}
+			dob = replaceNewLine(dob)
 
-	// validate dob if entered
-	if len(dob) > 0 {
-		// set logs
-		log.SetPrefix("date of birth:")
-		log.SetFlags(0)
+			// validate dob if entered
 
-		err = checkDate(dob)
-		if err != nil {
-			flag.PrintDefaults()
-			log.Fatal(err)
-		}
-	}
+			log.SetPrefix("date of birth:")
+			log.SetFlags(0)
 
-	// get max/min age if dob unknown
-	if fuzzDob {
-		if *maxPtr == 0 {
-			fmt.Print("Max age: ")
-			maxAgeString, _ := reader.ReadString('\n')
-			maxAgeString = replaceNewLine(maxAgeString)
-			maxAgeInYears, _ = strconv.Atoi(maxAgeString)
-		} else {
+			err := checkDate(dob)
+			if err != nil {
+				flag.PrintDefaults()
+				log.Fatal(err)
+			}
+		} else if *minPtr != 0 && *maxPtr != 0 {
 			maxAgeInYears = *maxPtr
-		}
-		if maxAgeInYears > 0 {
-			maxAge = true
-		}
-
-		if *minPtr == 0 {
-			fmt.Print("Min age: ")
-			minAgeString, _ := reader.ReadString('\n')
-			minAgeString = replaceNewLine(minAgeString)
-			minAgeInYears, _ = strconv.Atoi(minAgeString)
-		} else {
+			if maxAgeInYears > 0 {
+				maxAge = true
+			}
 			minAgeInYears = *minPtr
-		}
-		if minAgeInYears > 0 {
-			minAge = true
-		}
-
-		if minAge && maxAge {
+			if minAgeInYears > 0 {
+				minAge = true
+			}
 			//set logs
 			log.SetPrefix("Max/min age: ")
 			log.SetFlags(0)
 
 			// validate relative ages min/max
-			err = checkAges(maxAgeInYears, minAgeInYears)
+			err := checkAges(maxAgeInYears, minAgeInYears)
 			if err != nil {
 				flag.PrintDefaults()
 				log.Fatal(err)
 			}
+		} else {
+			fuzzDob = true
 		}
-	}
+		// prompt & store comune
+		if *comunePtr != "" {
 
-	// prompt & store comune
-	var comune string
-	if *comunePtr == "" {
-		fmt.Println("Enter comune of birth:")
-		comune, _ = reader.ReadString('\n')
-	} else {
-		comune = *comunePtr
-	}
-	comune = replaceNewLine(comune)
-	comune = strings.ToUpper(comune)
+			comune = *comunePtr
 
-	// detect unknown
-	if len(comune) == 0 {
-		fuzzComune = true
-	}
+			comune = replaceNewLine(comune)
+			comune = strings.ToUpper(comune)
 
-	// prompt and store output path
-	var path string
-	if *pathPtr == "" {
-		fmt.Println("Output path (/<PATH>/*.txt): ")
-		path, _ = reader.ReadString('\n')
-	} else {
-		path = *pathPtr
-	}
-	path = replaceNewLine(path)
-
-	// detect outfile
-	if len(path) > 0 {
-		writeOut = true
-	}
-
-	if writeOut {
-		// create given file
-		f, err = os.Create(path)
-		if err != nil {
-			flag.PrintDefaults()
-			log.Fatal(errors.New("ERROR CREATING OUTFILE"))
+		} else {
+			fuzzComune = true
 		}
-		defer f.Close()
+
+		// prompt and store output path
+		if *pathPtr != "" {
+
+			path = *pathPtr
+
+			path = replaceNewLine(path)
+
+			// detect outfile
+			if len(path) > 0 {
+				writeOut = true
+			}
+
+			if writeOut {
+				// create given file
+				file, err := os.Create(path)
+				f = file
+				if err != nil {
+					flag.PrintDefaults()
+					log.Fatal(errors.New("ERROR CREATING OUTFILE"))
+				}
+				defer f.Close()
+			}
+
+		} else {
+			writeOut = false
+		}
 	}
 
 	// Construct codice fiscale from known values
@@ -419,6 +358,9 @@ func main() {
 	}
 
 	if !fuzzDob {
+		const (
+			layoutISO = "2006-01-02"
+		)
 		t, _ := time.Parse(layoutISO, dob)
 
 		// birth year
@@ -452,7 +394,7 @@ func main() {
 		// check if comune exists
 		if !comuneExist {
 			fmt.Print("The comune entered does not exist.\n")
-			err = errors.New("COMUNE ERROR")
+			err := errors.New("COMUNE ERROR")
 			log.Fatal(err)
 		}
 	}
@@ -691,6 +633,195 @@ func calculateCheck(s string) string {
 
 	check := rem[combinedValue]
 	return check
+}
+
+func gatherInfo() {
+	// print title
+	title := figure.NewColorFigure("codice FUZZcale", "slant", "red", true)
+	title.Print()
+
+	// prompt if not all flags provided
+	// collect known information from user
+	fmt.Println("Just hit ENTER for unknown values")
+
+	// define reader
+	reader := bufio.NewReader(os.Stdin)
+
+	// prompt & store surname, if not passed as flag
+	fmt.Println("Enter surname(s): ")
+	surname, _ = reader.ReadString('\n')
+
+	// replace newline
+	surname = replaceNewLine(surname)
+
+	// strip spaces
+	surname = stripSpace(surname)
+
+	// detect unknown
+	if len(surname) == 0 {
+		fuzzSurname = true
+	}
+
+	// set logs
+	log.SetPrefix("surname: ")
+	log.SetFlags(0)
+
+	// check validity
+	err := checkName(surname)
+	if err != nil {
+		flag.PrintDefaults()
+		log.Fatal(err)
+	}
+	surname = strings.ToUpper(surname)
+
+	// prompt & store firstname
+	fmt.Println("Enter firstname(s):")
+	firstname, _ = reader.ReadString('\n')
+
+	// replace newline
+	firstname = replaceNewLine(firstname)
+	// strip spaces
+	firstname = stripSpace(firstname)
+
+	// detect unknown
+	if len(firstname) == 0 {
+		fuzzFirstname = true
+	}
+
+	// set logs
+	log.SetPrefix("firstname:")
+	log.SetFlags(0)
+
+	// check validity
+	err = checkName(firstname)
+	if err != nil {
+		flag.PrintDefaults()
+		log.Fatal(err)
+	}
+	firstname = strings.ToUpper(firstname)
+
+	// prompt & store sex
+	fmt.Println("Enter sex (M/F):")
+	sex, _ = reader.ReadString('\n')
+
+	sex = strings.ToUpper(sex)
+	sex = replaceNewLine(sex)
+
+	// detect unknown
+	if len(sex) == 0 {
+		fuzzSex = true
+	}
+
+	// set logs
+	log.SetPrefix("sex:")
+	log.SetFlags(0)
+
+	// validate sex
+	err = checkSex(sex)
+	if err != nil {
+		flag.PrintDefaults()
+		log.Fatal(err)
+	}
+
+	// prompt & store DOB
+	const (
+		layoutISO = "2006-01-02"
+	)
+
+	fmt.Println("Enter date of birth (yyyy-mm-dd):")
+	// var dob string
+	dob, _ = reader.ReadString('\n')
+
+	dob = replaceNewLine(dob)
+
+	// detect unknown
+	if len(dob) == 0 {
+		fuzzDob = true
+	}
+
+	// validate dob if entered
+	if len(dob) > 0 {
+		// set logs
+		log.SetPrefix("date of birth:")
+		log.SetFlags(0)
+
+		err = checkDate(dob)
+		if err != nil {
+			flag.PrintDefaults()
+			log.Fatal(err)
+		}
+	}
+
+	// get max/min age if dob unknown
+	if fuzzDob {
+
+		fmt.Print("Max age: ")
+		maxAgeString, _ := reader.ReadString('\n')
+		maxAgeString = replaceNewLine(maxAgeString)
+		maxAgeInYears, _ = strconv.Atoi(maxAgeString)
+
+		if maxAgeInYears > 0 {
+			maxAge = true
+		}
+
+		fmt.Print("Min age: ")
+		minAgeString, _ := reader.ReadString('\n')
+		minAgeString = replaceNewLine(minAgeString)
+		minAgeInYears, _ = strconv.Atoi(minAgeString)
+
+		if minAgeInYears > 0 {
+			minAge = true
+		}
+
+		if minAge && maxAge {
+			//set logs
+			log.SetPrefix("Max/min age: ")
+			log.SetFlags(0)
+
+			// validate relative ages min/max
+			err = checkAges(maxAgeInYears, minAgeInYears)
+			if err != nil {
+				flag.PrintDefaults()
+				log.Fatal(err)
+			}
+		}
+	}
+
+	// prompt & store comune
+	fmt.Println("Enter comune of birth:")
+	comune, _ = reader.ReadString('\n')
+
+	comune = replaceNewLine(comune)
+	comune = strings.ToUpper(comune)
+
+	// detect unknown
+	if len(comune) == 0 {
+		fuzzComune = true
+	}
+
+	// prompt and store output path
+	var path string
+
+	fmt.Println("Output path (/<PATH>/*.txt): ")
+	path, _ = reader.ReadString('\n')
+
+	path = replaceNewLine(path)
+
+	// detect outfile
+	if len(path) > 0 {
+		writeOut = true
+	}
+
+	if writeOut {
+		// create given file
+		f, err = os.Create(path)
+		if err != nil {
+			flag.PrintDefaults()
+			log.Fatal(errors.New("ERROR CREATING OUTFILE"))
+		}
+		defer f.Close()
+	}
+
 }
 
 // constructCF() constructs a fiscal code based on complete, known information
