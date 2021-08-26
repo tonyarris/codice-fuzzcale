@@ -240,7 +240,7 @@ func main() {
 			fuzzSex = true
 		}
 
-		// prompt & store DOB
+		// store DOB
 		const (
 			layoutISO = "2006-01-02"
 		)
@@ -279,6 +279,7 @@ func main() {
 				flag.PrintDefaults()
 				log.Fatal(err)
 			}
+			fuzzDob = true
 		} else {
 			fuzzDob = true
 		}
@@ -322,7 +323,7 @@ func main() {
 		}
 	}
 
-	// Construct codice fiscale from known values
+	// Construct codice fiscale
 
 	if !fuzzSurname {
 		// surname triplet
