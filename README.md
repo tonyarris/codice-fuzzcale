@@ -12,8 +12,3 @@ codice-fuzzcale will generate a list of all possible fiscal codes, based on inco
 For example, if I know the name, surname, sex and place of birth of an individual, but not their date of birth, I can enter those data to the tool and it will generate a list of all possible codes, which I can then use in further penetration testing on the target application. 
 
 Please note, this tool is intended only for use in target-approved ethical hacking activities, to help raise application security and privacy levels. 
-
-## Roadmap
-- [X] generate single, valid CFs from complete known information
-- [X] implement functionality for fuzzing unknown values, yielding 100% valid output (accounting for leap years, foreign states of birth etc.)
-- [ ] use heuristics such as popular names and surnames to create a 'best first' fuzzing list when name/surname are unknown, rather than AAAAAA, AAAAAB etc. 
