@@ -283,7 +283,7 @@ func main() {
 		} else {
 			fuzzDob = true
 		}
-		// prompt & store comune
+		// store comune
 		if *comunePtr != "" {
 
 			comune = *comunePtr
@@ -295,7 +295,7 @@ func main() {
 			fuzzComune = true
 		}
 
-		// prompt and store output path
+		// store output path
 		if *pathPtr != "" {
 
 			path = *pathPtr
@@ -411,6 +411,11 @@ func main() {
 
 		// generate CFs
 		generateCF(indicator, 0, "")
+
+		// close file if open
+		if writeOut {
+			f.Close()
+		}
 
 	}
 
@@ -820,7 +825,6 @@ func gatherInfo() {
 			flag.PrintDefaults()
 			log.Fatal(errors.New("ERROR CREATING OUTFILE"))
 		}
-		defer f.Close()
 	}
 
 }
