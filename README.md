@@ -11,4 +11,26 @@ codice-fuzzcale will generate a list of all possible fiscal codes, based on inco
 
 For example, if I know the name, surname, sex and place of birth of an individual, but not their date of birth, I can enter those data to the tool and it will generate a list of all possible codes, which I can then use in further penetration testing on the target application. 
 
+You can enter the data interactively or use the following flags:
+
+```
+Usage of ./codice-fuzzcale:
+  -c string
+        Comune of birth
+  -d string
+        Date of birth in the format yyyy-mm-dd
+  -max int
+        Maximum age
+  -min int
+        Minimum age
+  -n string
+        Name
+  -o string
+        Output path
+  -s string
+        Surname
+  -sex string
+        Sex
+```
+
 Please note, this tool is intended only for use in target-approved ethical hacking activities, to help raise application security and privacy levels. 
